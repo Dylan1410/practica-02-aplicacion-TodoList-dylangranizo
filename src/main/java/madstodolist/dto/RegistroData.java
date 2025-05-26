@@ -1,9 +1,10 @@
 package madstodolist.dto;
 
+import java.util.Date;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Email;
-import java.util.Date;
+import jakarta.validation.constraints.Email;
 
 // Clase de datos para el formulario de registro
 public class RegistroData {

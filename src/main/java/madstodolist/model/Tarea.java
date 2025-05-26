@@ -1,7 +1,9 @@
 package madstodolist.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -9,6 +11,7 @@ import java.util.Objects;
 @Table(name = "tareas")
 public class Tarea implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
