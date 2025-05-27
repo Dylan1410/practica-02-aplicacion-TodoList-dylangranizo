@@ -12,7 +12,7 @@ public class RegistroData {
     private String eMail;
     private String password;
     private String nombre;
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date fechaNacimiento;
 
     public String getEmail() {
