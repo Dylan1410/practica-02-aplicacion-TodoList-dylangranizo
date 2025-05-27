@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments :: head (titulo='Login')"></head>
-
+<head th:replace="fragments :: head (titulo='Lista de Tareas')">
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
 <body>
 <div class="container-fluid">
 
@@ -27,8 +28,15 @@
                 <tr th:each="tarea: ${tareas}">
                     <td th:text="${tarea.id}"></td>
                     <td th:text="${tarea.titulo}"></td>
-                    <td th:text="${tarea.prioridad}"></td>
-                    <td><a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}"/>editar</a>
+                    <td>
+                        <span th:text="${tarea.prioridad}"
+                            class="badge"
+                            th:classappend="${#strings.equals(tarea.prioridad, 'ALTA')} ? 'badge-danger' :
+                                            (${#strings.equals(tarea.prioridad, 'MEDIA')} ? 'badge-warning text-dark' :
+                                            (${#strings.equals(tarea.prioridad, 'BAJA')} ? 'badge-success' : 'badge-secondary'))">
+                        </span>
+                    </td>
+                    <td><a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}">editar</a>
                         <button class="btn btn-danger btn-xs" onmouseover="" style="cursor: pointer;"
                            th:onclick="'del(\'/tareas/' + ${tarea.id} + '\')'">borrar</button>
                     </td>
