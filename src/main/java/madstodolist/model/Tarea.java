@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,28 +25,28 @@ public class Tarea implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotNull
     private String titulo;
 
+    @Enumerated(EnumType.STRING)
+    private Prioridad prioridad;
+
     @NotNull
-    // Relación muchos-a-uno entre tareas y usuario
     @ManyToOne
-    // Nombre de la columna en la BD que guarda físicamente
-    // el ID del usuario con el que está asociado una tarea
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
     // Constructor vacío necesario para JPA/Hibernate.
-    // No debe usarse desde la aplicación.
     public Tarea() {}
 
-    // Al crear una tarea la asociamos automáticamente a un usuario
+    // Constructor con usuario y título
     public Tarea(Usuario usuario, String titulo) {
         this.titulo = titulo;
-        setUsuario(usuario); // Esto añadirá la tarea a la lista de tareas del usuario
+        setUsuario(usuario);
     }
 
-    // Getters y setters básicos
+    // Getters y setters
 
     public Long getId() {
         return id;
@@ -62,19 +64,21 @@ public class Tarea implements Serializable {
         this.titulo = titulo;
     }
 
-    // Getters y setters de la relación muchos-a-uno con Usuario
+    public Prioridad getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(Prioridad prioridad) {
+        this.prioridad = prioridad;
+    }
 
     public Usuario getUsuario() {
         return usuario;
     }
 
-    // Método para establecer la relación con el usuario
-
     public void setUsuario(Usuario usuario) {
-        // Comprueba si el usuario ya está establecido
-        if(this.usuario != usuario) {
+        if (this.usuario != usuario) {
             this.usuario = usuario;
-            // Añade la tarea a la lista de tareas del usuario
             usuario.addTarea(this);
         }
     }
@@ -85,9 +89,7 @@ public class Tarea implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Tarea tarea = (Tarea) o;
         if (id != null && tarea.id != null)
-            // Si tenemos los ID, comparamos por ID
             return Objects.equals(id, tarea.id);
-        // si no comparamos por campos obligatorios
         return titulo.equals(tarea.titulo) &&
                 usuario.equals(tarea.usuario);
     }
@@ -97,4 +99,3 @@ public class Tarea implements Serializable {
         return Objects.hash(titulo, usuario);
     }
 }
-

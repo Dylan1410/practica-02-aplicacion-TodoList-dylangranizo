@@ -19,13 +19,15 @@
                 <tr>
                     <th>Id</th>
                     <th>Tarea</th>
-                    <th>Acción</th>
+                    <th>Prioridad</th>
+                    <th>Accion</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="tarea: ${tareas}">
                     <td th:text="${tarea.id}"></td>
                     <td th:text="${tarea.titulo}"></td>
+                    <td th:text="${tarea.prioridad}"></td>
                     <td><a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}"/>editar</a>
                         <button class="btn btn-danger btn-xs" onmouseover="" style="cursor: pointer;"
                            th:onclick="'del(\'/tareas/' + ${tarea.id} + '\')'">borrar</button>

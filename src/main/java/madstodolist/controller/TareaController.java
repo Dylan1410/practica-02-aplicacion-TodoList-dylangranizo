@@ -19,6 +19,7 @@ import madstodolist.controller.exception.TareaNotFoundException;
 import madstodolist.controller.exception.UsuarioNoLogeadoException;
 import madstodolist.dto.TareaData;
 import madstodolist.dto.UsuarioData;
+import madstodolist.model.Prioridad;
 import madstodolist.service.TareaService;
 import madstodolist.service.UsuarioService;
 
@@ -49,6 +50,7 @@ public class TareaController {
 
         UsuarioData usuario = usuarioService.findById(idUsuario);
         model.addAttribute("usuario", usuario);
+        model.addAttribute("prioridades", Prioridad.values());  // Para usar en el select del formulario
         return "formNuevaTarea";
     }
 
@@ -59,7 +61,14 @@ public class TareaController {
 
         comprobarUsuarioLogeado(idUsuario);
 
-        tareaService.nuevaTareaUsuario(idUsuario, tareaData.getTitulo());
+        TareaData tareaCreada = tareaService.nuevaTareaUsuario(idUsuario, tareaData.getTitulo());
+
+        // Asignar prioridad si fue indicada (porque en el método original se pone MEDIA por defecto)
+        if (tareaData.getPrioridad() != null) {
+            tareaCreada.setPrioridad(tareaData.getPrioridad());
+            tareaService.modificaTareaDesdeDTO(tareaCreada.getId(), tareaCreada);
+        }
+
         flash.addFlashAttribute("mensaje", "Tarea creada correctamente");
         return "redirect:/usuarios/" + idUsuario + "/tareas";
      }
@@ -88,7 +97,9 @@ public class TareaController {
         comprobarUsuarioLogeado(tarea.getUsuarioId());
 
         model.addAttribute("tarea", tarea);
+        model.addAttribute("prioridades", Prioridad.values());  // Para mostrar en el formulario
         tareaData.setTitulo(tarea.getTitulo());
+        tareaData.setPrioridad(tarea.getPrioridad());
         return "formEditarTarea";
     }
 
@@ -101,18 +112,18 @@ public class TareaController {
         }
 
         Long idUsuario = tarea.getUsuarioId();
-
         comprobarUsuarioLogeado(idUsuario);
 
-        tareaService.modificaTarea(idTarea, tareaData.getTitulo());
+        tareaData.setId(idTarea);
+        tareaData.setUsuarioId(idUsuario);
+        tareaService.modificaTareaDesdeDTO(idTarea, tareaData);
+
         flash.addFlashAttribute("mensaje", "Tarea modificada correctamente");
         return "redirect:/usuarios/" + tarea.getUsuarioId() + "/tareas";
     }
 
     @DeleteMapping("/tareas/{id}")
     @ResponseBody
-    // La anotación @ResponseBody sirve para que la cadena devuelta sea la resupuesta
-    // de la petición HTTP, en lugar de una plantilla thymeleaf
     public String borrarTarea(@PathVariable(value="id") Long idTarea, RedirectAttributes flash, HttpSession session) {
         TareaData tarea = tareaService.findById(idTarea);
         if (tarea == null) {
@@ -125,4 +136,3 @@ public class TareaController {
         return "";
     }
 }
-

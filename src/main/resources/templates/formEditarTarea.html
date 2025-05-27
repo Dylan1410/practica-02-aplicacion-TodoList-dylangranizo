@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments :: head (titulo='Login')"></head>
+<head th:replace="fragments :: head (titulo='Editar Tarea')"></head>
 
 <body>
 <div class="container-fluid">
@@ -10,12 +10,27 @@
 
     <form method="post" th:action="@{/tareas/{id}/editar(id=${tarea.id})}" th:object="${tareaData}">
         <div class="col-6">
-        <div class="form-group">
-            <label for="titulo">Título de la tarea:</label>
-            <input class="form-control" id="titulo" name="titulo" required th:field="*{titulo}" type="text"/>
-        </div>
-        <button class="btn btn-primary" type="submit">Modificar tarea</button>
-        <a class="btn btn-link" th:href="@{/usuarios/{id}/tareas(id=${tarea.usuarioId})}">Cancelar</a>
+            <div class="form-group">
+                <label for="titulo">Título de la tarea:</label>
+                <input class="form-control" id="titulo" name="titulo" required th:field="*{titulo}" type="text"/>
+            </div>
+
+            <!-- NUEVO CAMPO: Selección de prioridad -->
+            <div class="form-group mt-3">
+                <label for="prioridad">Prioridad:</label>
+                <select class="form-control" id="prioridad" th:field="*{prioridad}">
+                    <option th:each="p : ${prioridades}"
+                            th:value="${p}"
+                            th:text="${p}"
+                            th:selected="${p == tareaData.prioridad}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="mt-3">
+                <button class="btn btn-primary" type="submit">Modificar tarea</button>
+                <a class="btn btn-link" th:href="@{/usuarios/{id}/tareas(id=${tarea.usuarioId})}">Cancelar</a>
+            </div>
         </div>
     </form>
 </div>
