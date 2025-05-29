@@ -1,5 +1,6 @@
 package madstodolist.service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +33,6 @@ public class TareaService {
     @Autowired
     private ModelMapper modelMapper;
 
-    // Método original conservado
     @Transactional
     public TareaData nuevaTareaUsuario(Long idUsuario, String tituloTarea) {
         logger.debug("Añadiendo tarea " + tituloTarea + " al usuario " + idUsuario);
@@ -46,7 +46,6 @@ public class TareaService {
         return modelMapper.map(tarea, TareaData.class);
     }
 
-    // NUEVO método con soporte para fechaLimite y prioridad
     @Transactional
     public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
         logger.debug("Añadiendo tarea con DTO al usuario " + idUsuario);
@@ -104,7 +103,7 @@ public class TareaService {
         }
         tarea.setTitulo(tareaData.getTitulo());
         tarea.setPrioridad(tareaData.getPrioridad());
-        tarea.setFechaLimite(tareaData.getFechaLimite()); // <-- NUEVO
+        tarea.setFechaLimite(tareaData.getFechaLimite());
         tarea = tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);
     }
@@ -127,5 +126,27 @@ public class TareaService {
             throw new TareaServiceException("No existe tarea o usuario id");
         }
         return usuario.getTareas().contains(tarea);
+    }
+
+    // ✅ NUEVOS MÉTODOS
+
+    @Transactional
+    public void actualizarPrioridad(Long idTarea, String prioridad) {
+        Tarea tarea = tareaRepository.findById(idTarea).orElse(null);
+        if (tarea == null) {
+            throw new TareaServiceException("No existe tarea con id " + idTarea);
+        }
+        tarea.setPrioridad(Prioridad.valueOf(prioridad));
+        tareaRepository.save(tarea);
+    }
+
+    @Transactional
+    public void actualizarFechaLimite(Long idTarea, LocalDate fechaLimite) {
+        Tarea tarea = tareaRepository.findById(idTarea).orElse(null);
+        if (tarea == null) {
+            throw new TareaServiceException("No existe tarea con id " + idTarea);
+        }
+        tarea.setFechaLimite(fechaLimite);
+        tareaRepository.save(tarea);
     }
 }

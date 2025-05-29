@@ -6,6 +6,7 @@
 </head>
 
 <body>
+<div th:replace="fragments :: navbar(${usuario})"></div>
 <div class="container-fluid">
 
     <div class="row mt-3">
@@ -34,47 +35,45 @@
     <div class="row" th:if="${tareas}">
         <div class="col-md-4 mb-4"
              th:each="tarea : ${tareas}"
-             th:attr="data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad}, data-fecha=${tarea.fechaLimite}">
+             th:attr="data-id=${tarea.id}, data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad}, data-fecha=${tarea.fechaLimite}">
             <div class="card shadow-sm h-100">
                 <div class="card-body d-flex flex-column justify-content-between">
-                    <div>
-                        <div th:attr="data-id=${tarea.id}" class="editable-titulo d-flex align-items-center justify-content-between w-100">
-                            <span class="titulo-texto flex-grow-1 mb-0" th:text="${tarea.titulo}">Título</span>
-                            <input class="form-control form-control-sm titulo-input d-none flex-grow-1"
-                                   type="text"
-                                   th:value="${tarea.titulo}">
-                            <button type="button" class="btn btn-outline-secondary btn-sm ml-2" title="Editar título">✏️</button>
-                        </div>
-                            <input class="form-control form-control-sm titulo-input d-none mt-2"
-                                   type="text"
-                                   th:value="${tarea.titulo}"
-                                   style="max-width: 100%;">
-                        </div>
-                        <p class="card-text mb-1 mt-2">
-                            <strong>Prioridad:</strong>
-                            <span th:text="${tarea.prioridad}"
-                                  class="badge"
-                                  th:classappend="${#strings.equals(tarea.prioridad, 'ALTA')} ? 'badge-danger' :
-                                                  (${#strings.equals(tarea.prioridad, 'MEDIA')} ? 'badge-warning text-dark' :
-                                                  (${#strings.equals(tarea.prioridad, 'BAJA')} ? 'badge-success' : 'badge-secondary'))">
-                            </span>
-                        </p>
-                        <p class="card-text mb-0">
-                            <strong>Fecha límite:</strong>
-                            <span th:text="${tarea.fechaLimite}"
-                                  th:classappend="${tarea.fechaLimiteProxima} ? 'text-danger font-weight-bold' : ''">
-                            </span>
-                            <span th:if="${tarea.fechaLimiteProxima}" class="badge badge-pill badge-warning ml-2">
-                                ⚠️ Urgente
-                            </span>
-                        </p>
+
+                    <!-- TÍTULO editable -->
+                    <div th:attr="data-id=${tarea.id}" class="editable-titulo d-flex align-items-center justify-content-between w-100 mb-2">
+                        <span class="titulo-texto flex-grow-1" th:text="${tarea.titulo}"></span>
+                        <input class="form-control form-control-sm titulo-input d-none flex-grow-1" type="text" th:value="${tarea.titulo}">
+                        <button type="button" class="btn btn-sm btn-outline-secondary ml-2">✏️</button>
                     </div>
-                    <div class="mt-3 text-right">
+
+                    <!-- PRIORIDAD editable -->
+                    <div class="mb-2">
+                        <label class="font-weight-bold mb-1">Prioridad:</label>
+                        <select class="form-control form-control-sm editable-prioridad" th:attr="data-id=${tarea.id}">
+                            <option value="BAJA" th:selected="${tarea.prioridad == 'BAJA'}">🟢 Baja</option>
+                            <option value="MEDIA" th:selected="${tarea.prioridad == 'MEDIA'}">🟡 Media</option>
+                            <option value="ALTA" th:selected="${tarea.prioridad == 'ALTA'}">🔴 Alta</option>
+                        </select>
+                    </div>
+
+                    <!-- FECHA editable -->
+                    <div class="mb-2">
+                        <label class="font-weight-bold mb-1">Fecha límite:</label>
+                        <input type="date" class="form-control form-control-sm editable-fecha" th:value="${tarea.fechaLimite}" th:attr="data-id=${tarea.id}">
+                        <span class="badge badge-pill badge-warning mt-2 urgente-badge"
+                              th:if="${tarea.fechaLimiteProxima}" style="display: inline;">⚠️ Urgente</span>
+                        <span class="badge badge-pill badge-warning mt-2 urgente-badge"
+                              th:unless="${tarea.fechaLimiteProxima}" style="display: none;">⚠️ Urgente</span>
+                    </div>
+
+                    <!-- BORRAR -->
+                    <div class="text-right mt-2">
                         <button class="btn btn-danger btn-sm"
                                 data-toggle="modal"
                                 data-target="#confirmarEliminacionModal"
                                 th:attr="data-id=${tarea.id}">Borrar</button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -99,112 +98,165 @@
 
 <!-- Modal de Confirmación de Eliminación -->
 <div class="modal fade" id="confirmarEliminacionModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalLabel">Confirmar eliminación</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ¿Estás seguro/a de que deseas eliminar esta tarea?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        <button id="btnConfirmarEliminar" type="button" class="btn btn-danger">Eliminar</button>
-      </div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Confirmar eliminación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro/a de que deseas eliminar esta tarea?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnConfirmarEliminar" type="button" class="btn btn-danger">Eliminar</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- Fragmento para incluir scripts comunes -->
+<!-- Scripts comunes -->
 <div th:replace="fragments::javascript"></div>
 
+<!-- Scripts funcionales -->
 <script>
-    let idTareaAEliminar = null;
+document.addEventListener("DOMContentLoaded", function () {
+    // === TÍTULO editable ===
+    document.querySelectorAll(".editable-titulo").forEach(function (wrapper) {
+        const span = wrapper.querySelector(".titulo-texto");
+        const input = wrapper.querySelector(".titulo-input");
+        const btn = wrapper.querySelector("button");
+        const id = wrapper.getAttribute("data-id");
 
-    $('#confirmarEliminacionModal').on('show.bs.modal', function (event) {
-        const button = $(event.relatedTarget);
-        idTareaAEliminar = button.data('id');
+        btn.addEventListener("click", () => {
+            span.classList.add("d-none");
+            input.classList.remove("d-none");
+            input.focus();
+        });
+
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                const nuevo = input.value.trim();
+                if (!nuevo) return;
+
+                fetch(`/api/tareas/${id}/titulo`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ titulo: nuevo })
+                }).then(r => {
+                    if (r.ok) {
+                        span.textContent = nuevo;
+                        input.classList.add("d-none");
+                        span.classList.remove("d-none");
+
+                        const card = wrapper.closest(".col-md-4");
+                        card.setAttribute("data-titulo", nuevo);
+                    } else {
+                        alert("Error al guardar título");
+                    }
+                });
+            }
+        });
     });
 
-    document.getElementById('btnConfirmarEliminar').addEventListener('click', function () {
-        if (!idTareaAEliminar) return;
-        fetch(`/tareas/${idTareaAEliminar}`, {
-            method: 'DELETE'
-        }).then(() => location.reload());
-    });
-</script>
+    // === PRIORIDAD editable ===
+    document.querySelectorAll(".editable-prioridad").forEach(select => {
+        select.addEventListener("change", () => {
+            const id = select.getAttribute("data-id");
+            const valor = select.value;
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".editable-titulo").forEach(function (wrapper) {
-            const spanTexto = wrapper.querySelector(".titulo-texto");
-            const input = wrapper.querySelector(".titulo-input");
-            const tareaId = wrapper.getAttribute("data-id");
-
-            wrapper.addEventListener("click", function () {
-                spanTexto.classList.add("d-none");
-                input.classList.remove("d-none");
-                input.focus();
-            });
-
-            input.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") {
-                    const nuevoTitulo = input.value.trim();
-                    if (nuevoTitulo === "") return;
-
-                    fetch(`/api/tareas/${tareaId}/titulo`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ titulo: nuevoTitulo })
-                    }).then(response => {
-                        if (response.ok) {
-                            spanTexto.textContent = nuevoTitulo;
-                            input.classList.add("d-none");
-                            spanTexto.classList.remove("d-none");
-                        } else {
-                            alert("Error al guardar el nuevo título");
-                        }
-                    });
+            fetch(`/api/tareas/${id}/prioridad`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prioridad: valor })
+            }).then(r => {
+                if (!r.ok) {
+                    alert("Error al actualizar prioridad");
+                } else {
+                    const card = select.closest(".col-md-4");
+                    card.setAttribute("data-prioridad", valor);
                 }
             });
         });
     });
+
+    // === FECHA editable + alerta urgente ===
+    document.querySelectorAll(".editable-fecha").forEach(input => {
+        input.addEventListener("change", () => {
+            const id = input.getAttribute("data-id");
+            const fecha = input.value;
+
+            fetch(`/api/tareas/${id}/fechaLimite`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fechaLimite: fecha })
+            }).then(r => {
+                if (!r.ok) {
+                    alert("Error al actualizar fecha");
+                    return;
+                }
+
+                const hoy = new Date();
+                const futura = new Date(fecha);
+                const dias = Math.ceil((futura - hoy) / (1000 * 60 * 60 * 24));
+
+                document.querySelectorAll(`.col-md-4[data-id='${id}'] .urgente-badge`).forEach(b => {
+                    b.style.display = dias <= 3 ? 'inline' : 'none';
+                });
+
+                const card = input.closest(".col-md-4");
+                card.setAttribute("data-fecha", fecha);
+            });
+        });
+    });
+
+    // === FILTROS ===
+    const filtroTitulo = document.getElementById("filtroTitulo");
+    const filtroPrioridad = document.getElementById("filtroPrioridad");
+    const filtroFecha = document.getElementById("filtroFecha");
+
+    function aplicarFiltros() {
+        const titulo = filtroTitulo.value.toLowerCase();
+        const prioridad = filtroPrioridad.value;
+        const fecha = filtroFecha.value;
+        const tarjetas = document.querySelectorAll(".col-md-4[data-titulo]");
+
+        tarjetas.forEach(card => {
+            const tituloCard = card.getAttribute("data-titulo").toLowerCase();
+            const prioridadCard = card.getAttribute("data-prioridad");
+            const fechaCard = card.getAttribute("data-fecha");
+
+            const coincideTitulo = titulo === "" || tituloCard.includes(titulo);
+            const coincidePrioridad = prioridad === "" || prioridadCard === prioridad;
+            const coincideFecha = fecha === "" || fechaCard === fecha;
+
+            card.style.display = (coincideTitulo && coincidePrioridad && coincideFecha) ? "" : "none";
+        });
+    }
+
+    filtroTitulo.addEventListener("input", aplicarFiltros);
+    filtroPrioridad.addEventListener("change", aplicarFiltros);
+    filtroFecha.addEventListener("change", aplicarFiltros);
+});
 </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const filtroTitulo = document.getElementById("filtroTitulo");
-        const filtroPrioridad = document.getElementById("filtroPrioridad");
-        const filtroFecha = document.getElementById("filtroFecha");
-        const tarjetas = document.querySelectorAll(".col-md-4[data-titulo]");
+let idTareaAEliminar = null;
 
-        function aplicarFiltros() {
-            const titulo = filtroTitulo.value.toLowerCase();
-            const prioridad = filtroPrioridad.value;
-            const fecha = filtroFecha.value;
+$('#confirmarEliminacionModal').on('show.bs.modal', function (event) {
+    const button = $(event.relatedTarget);
+    idTareaAEliminar = button.data('id');
+});
 
-            tarjetas.forEach(card => {
-                const tituloCard = card.getAttribute("data-titulo").toLowerCase();
-                const prioridadCard = card.getAttribute("data-prioridad");
-                const fechaCard = card.getAttribute("data-fecha");
-
-                const coincideTitulo = titulo === "" || tituloCard.includes(titulo);
-                const coincidePrioridad = prioridad === "" || prioridadCard === prioridad;
-                const coincideFecha = fecha === "" || fechaCard === fecha;
-
-                card.style.display = (coincideTitulo && coincidePrioridad && coincideFecha) ? "" : "none";
-            });
-        }
-
-        filtroTitulo.addEventListener("input", aplicarFiltros);
-        filtroPrioridad.addEventListener("change", aplicarFiltros);
-        filtroFecha.addEventListener("change", aplicarFiltros);
-    });
+document.getElementById('btnConfirmarEliminar').addEventListener('click', function () {
+    if (!idTareaAEliminar) return;
+    fetch(`/tareas/${idTareaAEliminar}`, {
+        method: 'DELETE'
+    }).then(() => location.reload());
+});
 </script>
+
 </body>
 </html>
