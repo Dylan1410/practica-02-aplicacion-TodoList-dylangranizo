@@ -1,14 +1,14 @@
 package madstodolist.service;
 
-import madstodolist.model.Tarea;
-import madstodolist.model.Usuario;
-import madstodolist.repository.TareaRepository;
-import madstodolist.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+import madstodolist.model.Tarea;
+import madstodolist.model.Usuario;
+import madstodolist.repository.TareaRepository;
+import madstodolist.repository.UsuarioRepository;
 
 @Service
 // Se ejecuta solo si el perfil activo es 'dev'
