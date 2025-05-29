@@ -15,6 +15,22 @@
 
     <div class="row mt-3">
         <div class="col">
+            <div class="row mt-3 mb-3">
+                <div class="col-md-4">
+                    <input type="text" id="filtroTitulo" class="form-control" placeholder="🔍 Buscar por título...">
+                </div>
+                <div class="col-md-4">
+                    <select id="filtroPrioridad" class="form-control">
+                        <option value="">🎯 Todas las prioridades</option>
+                        <option value="BAJA">🟢 Baja</option>
+                        <option value="MEDIA">🟡 Media</option>
+                        <option value="ALTA">🔴 Alta</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="date" id="filtroFecha" class="form-control" placeholder="📅 Filtrar por fecha límite">
+                </div>
+            </div>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -26,7 +42,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="tarea: ${tareas}">
+                <tr th:each="tarea: ${tareas}"
+                    th:attr="data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad}, data-fecha=${tarea.fechaLimite}">
                     <td th:text="${tarea.id}"></td>
                     <td>
                         <span th:attr="data-id=${tarea.id}" class="editable-titulo d-inline-flex align-items-center" style="gap: 5px; cursor: pointer;">
@@ -131,6 +148,37 @@
             });
         });
     });
+    </script>
+    <!-- Filtrado de Tareas -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const filtroTitulo = document.getElementById("filtroTitulo");
+            const filtroPrioridad = document.getElementById("filtroPrioridad");
+            const filtroFecha = document.getElementById("filtroFecha");
+            const filas = document.querySelectorAll("tbody tr");
+    
+            function aplicarFiltros() {
+                const titulo = filtroTitulo.value.toLowerCase();
+                const prioridad = filtroPrioridad.value;
+                const fecha = filtroFecha.value;
+    
+                filas.forEach(fila => {
+                    const tituloFila = fila.getAttribute("data-titulo").toLowerCase();
+                    const prioridadFila = fila.getAttribute("data-prioridad");
+                    const fechaFila = fila.getAttribute("data-fecha");
+    
+                    const coincideTitulo = titulo === "" || tituloFila.includes(titulo);
+                    const coincidePrioridad = prioridad === "" || prioridadFila === prioridad;
+                    const coincideFecha = fecha === "" || fechaFila === fecha;
+    
+                    fila.style.display = (coincideTitulo && coincidePrioridad && coincideFecha) ? "" : "none";
+                });
+            }
+    
+            filtroTitulo.addEventListener("input", aplicarFiltros);
+            filtroPrioridad.addEventListener("change", aplicarFiltros);
+            filtroFecha.addEventListener("change", aplicarFiltros);
+        });
     </script>
     
 
