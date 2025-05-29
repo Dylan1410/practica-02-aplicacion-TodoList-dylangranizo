@@ -41,6 +41,8 @@ public class Tarea implements Serializable {
     private Usuario usuario;
     @Column(name= "fecha_limite")
     private LocalDate fechaLimite;
+    @Column(nullable = false)
+    private boolean completada = false;
 
     // Constructor vacío necesario para JPA/Hibernate.
     public Tarea() {}
@@ -92,6 +94,12 @@ public class Tarea implements Serializable {
     }
     public void setFechaLimite(LocalDate fechaLimite) {
         this.fechaLimite = fechaLimite;
+    }
+    public boolean isCompletada() {
+        return completada;
+    }
+    public void setCompletada(boolean completada) {
+        this.completada = completada;
     }
 
     @Override

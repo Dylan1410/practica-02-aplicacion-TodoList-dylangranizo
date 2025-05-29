@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,4 +129,16 @@ public class TareaService {
         }
         return usuario.getTareas().contains(tarea);
     }
+    @Transactional
+    public void actualizarEstadoCompletada(Long id, boolean completada) {
+    Optional<Tarea> tareaOpt = tareaRepository.findById(id);
+    if (tareaOpt.isPresent()) {
+        Tarea tarea = tareaOpt.get();
+        tarea.setCompletada(completada);
+        tareaRepository.save(tarea);
+    } else {
+        throw new TareaServiceException("Tarea no encontrada con id: " + id);
+    }
+}
+
 }

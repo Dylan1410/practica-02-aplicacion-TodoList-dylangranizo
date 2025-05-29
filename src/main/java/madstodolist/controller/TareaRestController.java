@@ -4,11 +4,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import madstodolist.service.TareaService;
 
@@ -19,6 +15,7 @@ public class TareaRestController {
     @Autowired
     TareaService tareaService;
 
+    // ✅ Actualizar título
     @PutMapping("/{id}/titulo")
     public ResponseEntity<?> actualizarTitulo(@PathVariable Long id, @RequestBody Map<String, String> payload) {
         String nuevoTitulo = payload.get("titulo");
@@ -26,6 +23,17 @@ public class TareaRestController {
             return ResponseEntity.badRequest().body("Título vacío");
         }
         tareaService.modificaTarea(id, nuevoTitulo);
+        return ResponseEntity.ok().build();
+    }
+
+    // ✅ Nuevo: actualizar estado completada
+    @PutMapping("/{id}/completada")
+    public ResponseEntity<?> actualizarEstadoCompletada(@PathVariable Long id, @RequestBody Map<String, Boolean> payload) {
+        Boolean completada = payload.get("completada");
+        if (completada == null) {
+            return ResponseEntity.badRequest().body("Estado 'completada' no proporcionado");
+        }
+        tareaService.actualizarEstadoCompletada(id, completada);
         return ResponseEntity.ok().build();
     }
 }

@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="fragments :: head (titulo='Lista de Tareas')">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <style>
+        .tarea-completada {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+    </style>
 </head>
-
 <body>
 <div class="container-fluid">
-
     <div class="row mt-3">
         <div class="col">
             <h2 th:text="'Listado de tareas de ' + ${usuario.nombre}"></h2>
@@ -48,11 +51,13 @@
                     th:attr="data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad}, data-fecha=${tarea.fechaLimite}">
                     <td th:text="${tarea.id}"></td>
                     <td>
-                        <span th:attr="data-id=${tarea.id}" class="editable-titulo d-inline-flex align-items-center" style="gap: 5px; cursor: pointer;">
-                            <span class="emoji-icon">✏️</span>
-                            <span class="titulo-texto" th:text="${tarea.titulo}"></span>
-                            <input class="form-control form-control-sm titulo-input d-none" type="text" th:value="${tarea.titulo}" style="width: auto; max-width: 300px;">
-                        </span>
+                        <input type="checkbox"
+                               class="checkbox-completada mr-2"
+                               th:attr="data-id=${tarea.id}"
+                               th:checked="${tarea.completada}" />
+
+                        <span th:text="${tarea.titulo}"
+                              th:classappend="${tarea.completada} ? 'tarea-completada' : ''"></span>
                     </td>
                     <td>
                         <span th:text="${tarea.prioridad}"
@@ -124,7 +129,7 @@
 <!-- Fragmento JavaScript -->
 <div th:replace="fragments::javascript"></div>
 
-<!-- Scripts funcionales -->
+<!-- Scripts -->
 <script>
     let idTareaAEliminar = null;
 
@@ -143,38 +148,31 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".editable-titulo").forEach(function (wrapper) {
-            const spanTexto = wrapper.querySelector(".titulo-texto");
-            const input = wrapper.querySelector(".titulo-input");
-            const tareaId = wrapper.getAttribute("data-id");
+        document.querySelectorAll(".checkbox-completada").forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                const tareaId = this.getAttribute("data-id");
+                const completada = this.checked;
 
-            wrapper.addEventListener("click", function () {
-                spanTexto.classList.add("d-none");
-                input.classList.remove("d-none");
-                input.focus();
-            });
-
-            input.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") {
-                    const nuevoTitulo = input.value.trim();
-                    if (nuevoTitulo === "") return;
-
-                    fetch(`/api/tareas/${tareaId}/titulo`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ titulo: nuevoTitulo })
-                    }).then(response => {
-                        if (response.ok) {
-                            spanTexto.textContent = nuevoTitulo;
-                            input.classList.add("d-none");
-                            spanTexto.classList.remove("d-none");
+                fetch(`/api/tareas/${tareaId}/completada`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ completada: completada })
+                }).then(response => {
+                    if (response.ok) {
+                        const row = this.closest("tr");
+                        const tituloSpan = row.querySelector("span");
+                        if (completada) {
+                            tituloSpan.classList.add("tarea-completada");
                         } else {
-                            alert("Error al guardar el nuevo título");
+                            tituloSpan.classList.remove("tarea-completada");
                         }
-                    });
-                }
+                    } else {
+                        alert("Error al actualizar el estado de la tarea.");
+                        this.checked = !completada;
+                    }
+                });
             });
         });
     });
