@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments :: head (titulo='Editar Tarea')"></head>
-
+<head th:replace="fragments :: head (titulo='Editar Tarea')">
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
 <body>
 <div class="container-fluid">
 
@@ -46,6 +47,7 @@
 </div>
 
 <div th:replace="fragments::javascript"/>
+
 
 </body>
 </html>

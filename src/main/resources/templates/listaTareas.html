@@ -2,8 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="fragments :: head (titulo='Lista de Tareas')">
-<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
+
 <body>
 <div class="container-fluid">
 
@@ -31,6 +32,7 @@
                     <input type="date" id="filtroFecha" class="form-control" placeholder="📅 Filtrar por fecha límite">
                 </div>
             </div>
+
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -38,7 +40,7 @@
                     <th>Tarea</th>
                     <th>Prioridad</th>
                     <th>Fecha Límite</th>
-                    <th>Accion</th>
+                    <th>Acción</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -51,36 +53,40 @@
                             <span class="titulo-texto" th:text="${tarea.titulo}"></span>
                             <input class="form-control form-control-sm titulo-input d-none" type="text" th:value="${tarea.titulo}" style="width: auto; max-width: 300px;">
                         </span>
-                    </td>                    
+                    </td>
                     <td>
                         <span th:text="${tarea.prioridad}"
-                            class="badge"
-                            th:classappend="${#strings.equals(tarea.prioridad, 'ALTA')} ? 'badge-danger' :
-                                            (${#strings.equals(tarea.prioridad, 'MEDIA')} ? 'badge-warning text-dark' :
-                                            (${#strings.equals(tarea.prioridad, 'BAJA')} ? 'badge-success' : 'badge-secondary'))">
+                              class="badge"
+                              th:classappend="${#strings.equals(tarea.prioridad, 'ALTA')} ? 'badge-danger' :
+                                              (${#strings.equals(tarea.prioridad, 'MEDIA')} ? 'badge-warning text-dark' :
+                                              (${#strings.equals(tarea.prioridad, 'BAJA')} ? 'badge-success' : 'badge-secondary'))">
                         </span>
                     </td>
                     <td>
                         <span th:text="${tarea.fechaLimite}"
                               th:classappend="${tarea.fechaLimiteProxima} ? 'text-danger font-weight-bold' : ''">
                         </span>
-                    
+
                         <span th:if="${tarea.fechaLimiteProxima}" class="badge badge-pill badge-warning ml-2" title="¡Esta tarea vence pronto!">
                             ⚠️ Urgente
                         </span>
                     </td>
-                    
-                    <td><a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}">editar</a>
-                        <button class="btn btn-danger btn-xs" onmouseover="" style="cursor: pointer;"
-                           th:onclick="'del(\'/tareas/' + ${tarea.id} + '\')'">borrar</button>
+                    <td>
+                        <a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}">editar</a>
+                        <button class="btn btn-danger btn-xs" style="cursor: pointer;"
+                                th:onclick="'del(\'/tareas/' + ${tarea.id} + '\')'">borrar</button>
                     </td>
                 </tr>
                 </tbody>
             </table>
-            <p><a class="btn btn-primary" th:href="@{/usuarios/{id}/tareas/nueva(id=${usuario.id})}"> Nueva tarea</a>
-            <a class="btn btn-link" href="/logout">Salir</a></p>
+
+            <p>
+                <a class="btn btn-primary" th:href="@{/usuarios/{id}/tareas/nueva(id=${usuario.id})}">Nueva tarea</a>
+                <a class="btn btn-link" href="/logout">Salir</a>
+            </p>
         </div>
     </div>
+
     <div class="row mt-2">
         <div class="col">
             <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${!#strings.isEmpty(mensaje)}">
@@ -93,13 +99,10 @@
     </div>
 </div>
 
-
-</div>
-
+<!-- Fragmento JavaScript -->
 <div th:replace="fragments::javascript"/>
 
-<!-- Lanzamos una petición DELETE por JavaScript para borrar una tarea -->
-
+<!-- Scripts funcionales -->
 <script type="text/javascript">
     function del(urlBorrar) {
         if (confirm('¿Estás seguro/a de que quieres borrar la tarea?')) {
@@ -109,33 +112,32 @@
         }
     }
 </script>
-<!-- Editar Tarea desde la pantalla -->
+
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll(".editable-titulo").forEach(function(wrapper) {
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".editable-titulo").forEach(function (wrapper) {
             const spanTexto = wrapper.querySelector(".titulo-texto");
             const input = wrapper.querySelector(".titulo-input");
             const tareaId = wrapper.getAttribute("data-id");
-    
-            wrapper.addEventListener("click", function() {
+
+            wrapper.addEventListener("click", function () {
                 spanTexto.classList.add("d-none");
                 input.classList.remove("d-none");
                 input.focus();
             });
-    
-            input.addEventListener("keydown", function(e) {
+
+            input.addEventListener("keydown", function (e) {
                 if (e.key === "Enter") {
                     const nuevoTitulo = input.value.trim();
                     if (nuevoTitulo === "") return;
-    
+
                     fetch(`/api/tareas/${tareaId}/titulo`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ titulo: nuevoTitulo })
-                    })
-                    .then(response => {
+                    }).then(response => {
                         if (response.ok) {
                             spanTexto.textContent = nuevoTitulo;
                             input.classList.add("d-none");
@@ -148,39 +150,37 @@
             });
         });
     });
-    </script>
-    <!-- Filtrado de Tareas -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const filtroTitulo = document.getElementById("filtroTitulo");
-            const filtroPrioridad = document.getElementById("filtroPrioridad");
-            const filtroFecha = document.getElementById("filtroFecha");
-            const filas = document.querySelectorAll("tbody tr");
-    
-            function aplicarFiltros() {
-                const titulo = filtroTitulo.value.toLowerCase();
-                const prioridad = filtroPrioridad.value;
-                const fecha = filtroFecha.value;
-    
-                filas.forEach(fila => {
-                    const tituloFila = fila.getAttribute("data-titulo").toLowerCase();
-                    const prioridadFila = fila.getAttribute("data-prioridad");
-                    const fechaFila = fila.getAttribute("data-fecha");
-    
-                    const coincideTitulo = titulo === "" || tituloFila.includes(titulo);
-                    const coincidePrioridad = prioridad === "" || prioridadFila === prioridad;
-                    const coincideFecha = fecha === "" || fechaFila === fecha;
-    
-                    fila.style.display = (coincideTitulo && coincidePrioridad && coincideFecha) ? "" : "none";
-                });
-            }
-    
-            filtroTitulo.addEventListener("input", aplicarFiltros);
-            filtroPrioridad.addEventListener("change", aplicarFiltros);
-            filtroFecha.addEventListener("change", aplicarFiltros);
-        });
-    </script>
-    
+</script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filtroTitulo = document.getElementById("filtroTitulo");
+        const filtroPrioridad = document.getElementById("filtroPrioridad");
+        const filtroFecha = document.getElementById("filtroFecha");
+        const filas = document.querySelectorAll("tbody tr");
+
+        function aplicarFiltros() {
+            const titulo = filtroTitulo.value.toLowerCase();
+            const prioridad = filtroPrioridad.value;
+            const fecha = filtroFecha.value;
+
+            filas.forEach(fila => {
+                const tituloFila = fila.getAttribute("data-titulo").toLowerCase();
+                const prioridadFila = fila.getAttribute("data-prioridad");
+                const fechaFila = fila.getAttribute("data-fecha");
+
+                const coincideTitulo = titulo === "" || tituloFila.includes(titulo);
+                const coincidePrioridad = prioridad === "" || prioridadFila === prioridad;
+                const coincideFecha = fecha === "" || fechaFila === fecha;
+
+                fila.style.display = (coincideTitulo && coincidePrioridad && coincideFecha) ? "" : "none";
+            });
+        }
+
+        filtroTitulo.addEventListener("input", aplicarFiltros);
+        filtroPrioridad.addEventListener("change", aplicarFiltros);
+        filtroFecha.addEventListener("change", aplicarFiltros);
+    });
+</script>
 </body>
 </html>
