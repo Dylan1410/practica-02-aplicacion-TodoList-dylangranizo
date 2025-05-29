@@ -28,7 +28,13 @@
                 <tbody>
                 <tr th:each="tarea: ${tareas}">
                     <td th:text="${tarea.id}"></td>
-                    <td th:text="${tarea.titulo}"></td>
+                    <td>
+                        <span th:attr="data-id=${tarea.id}" class="editable-titulo d-inline-flex align-items-center" style="gap: 5px; cursor: pointer;">
+                            <span class="emoji-icon">✏️</span>
+                            <span class="titulo-texto" th:text="${tarea.titulo}"></span>
+                            <input class="form-control form-control-sm titulo-input d-none" type="text" th:value="${tarea.titulo}" style="width: auto; max-width: 300px;">
+                        </span>
+                    </td>                    
                     <td>
                         <span th:text="${tarea.prioridad}"
                             class="badge"
@@ -86,6 +92,47 @@
         }
     }
 </script>
+<!-- Editar Tarea desde la pantalla -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".editable-titulo").forEach(function(wrapper) {
+            const spanTexto = wrapper.querySelector(".titulo-texto");
+            const input = wrapper.querySelector(".titulo-input");
+            const tareaId = wrapper.getAttribute("data-id");
+    
+            wrapper.addEventListener("click", function() {
+                spanTexto.classList.add("d-none");
+                input.classList.remove("d-none");
+                input.focus();
+            });
+    
+            input.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    const nuevoTitulo = input.value.trim();
+                    if (nuevoTitulo === "") return;
+    
+                    fetch(`/api/tareas/${tareaId}/titulo`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ titulo: nuevoTitulo })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            spanTexto.textContent = nuevoTitulo;
+                            input.classList.add("d-none");
+                            spanTexto.classList.remove("d-none");
+                        } else {
+                            alert("Error al guardar el nuevo título");
+                        }
+                    });
+                }
+            });
+        });
+    });
+    </script>
+    
 
 </body>
 </html>
