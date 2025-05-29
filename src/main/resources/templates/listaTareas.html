@@ -14,79 +14,76 @@
         </div>
     </div>
 
-    <div class="row mt-3">
-        <div class="col">
-            <div class="row mt-3 mb-3">
-                <div class="col-md-4">
-                    <input type="text" id="filtroTitulo" class="form-control" placeholder="🔍 Buscar por título...">
-                </div>
-                <div class="col-md-4">
-                    <select id="filtroPrioridad" class="form-control">
-                        <option value="">🎯 Todas las prioridades</option>
-                        <option value="BAJA">🟢 Baja</option>
-                        <option value="MEDIA">🟡 Media</option>
-                        <option value="ALTA">🔴 Alta</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <input type="date" id="filtroFecha" class="form-control" placeholder="📅 Filtrar por fecha límite">
-                </div>
-            </div>
-
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Tarea</th>
-                    <th>Prioridad</th>
-                    <th>Fecha Límite</th>
-                    <th>Acción</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="tarea: ${tareas}"
-                    th:attr="data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad}, data-fecha=${tarea.fechaLimite}">
-                    <td th:text="${tarea.id}"></td>
-                    <td>
-                        <span th:attr="data-id=${tarea.id}" class="editable-titulo d-inline-flex align-items-center" style="gap: 5px; cursor: pointer;">
-                            <span class="emoji-icon">✏️</span>
-                            <span class="titulo-texto" th:text="${tarea.titulo}"></span>
-                            <input class="form-control form-control-sm titulo-input d-none" type="text" th:value="${tarea.titulo}" style="width: auto; max-width: 300px;">
-                        </span>
-                    </td>
-                    <td>
-                        <span th:text="${tarea.prioridad}"
-                              class="badge"
-                              th:classappend="${#strings.equals(tarea.prioridad, 'ALTA')} ? 'badge-danger' :
-                                              (${#strings.equals(tarea.prioridad, 'MEDIA')} ? 'badge-warning text-dark' :
-                                              (${#strings.equals(tarea.prioridad, 'BAJA')} ? 'badge-success' : 'badge-secondary'))">
-                        </span>
-                    </td>
-                    <td>
-                        <span th:text="${tarea.fechaLimite}"
-                              th:classappend="${tarea.fechaLimiteProxima} ? 'text-danger font-weight-bold' : ''">
-                        </span>
-                        <span th:if="${tarea.fechaLimiteProxima}" class="badge badge-pill badge-warning ml-2" title="¡Esta tarea vence pronto!">
-                            ⚠️ Urgente
-                        </span>
-                    </td>
-                    <td>
-                        <a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}">editar</a>
-                        <button class="btn btn-danger btn-xs" style="cursor: pointer;"
-                                data-toggle="modal"
-                                data-target="#confirmarEliminacionModal"
-                                th:attr="data-id=${tarea.id}">borrar</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-            <p>
-                <a class="btn btn-primary" th:href="@{/usuarios/{id}/tareas/nueva(id=${usuario.id})}">Nueva tarea</a>
-                <a class="btn btn-link" href="/logout">Salir</a>
-            </p>
+    <div class="row mt-3 mb-3">
+        <div class="col-md-4">
+            <input type="text" id="filtroTitulo" class="form-control" placeholder="🔍 Buscar por título...">
+        </div>
+        <div class="col-md-4">
+            <select id="filtroPrioridad" class="form-control">
+                <option value="">🎯 Todas las prioridades</option>
+                <option value="BAJA">🟢 Baja</option>
+                <option value="MEDIA">🟡 Media</option>
+                <option value="ALTA">🔴 Alta</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="date" id="filtroFecha" class="form-control" placeholder="📅 Filtrar por fecha límite">
         </div>
     </div>
+
+    <div class="row" th:if="${tareas}">
+        <div class="col-md-4 mb-4"
+             th:each="tarea : ${tareas}"
+             th:attr="data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad}, data-fecha=${tarea.fechaLimite}">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div th:attr="data-id=${tarea.id}" class="editable-titulo d-flex align-items-center justify-content-between w-100">
+                            <span class="titulo-texto flex-grow-1 mb-0" th:text="${tarea.titulo}">Título</span>
+                            <input class="form-control form-control-sm titulo-input d-none flex-grow-1"
+                                   type="text"
+                                   th:value="${tarea.titulo}">
+                            <button type="button" class="btn btn-outline-secondary btn-sm ml-2" title="Editar título">✏️</button>
+                        </div>
+                            <input class="form-control form-control-sm titulo-input d-none mt-2"
+                                   type="text"
+                                   th:value="${tarea.titulo}"
+                                   style="max-width: 100%;">
+                        </div>
+                        <p class="card-text mb-1 mt-2">
+                            <strong>Prioridad:</strong>
+                            <span th:text="${tarea.prioridad}"
+                                  class="badge"
+                                  th:classappend="${#strings.equals(tarea.prioridad, 'ALTA')} ? 'badge-danger' :
+                                                  (${#strings.equals(tarea.prioridad, 'MEDIA')} ? 'badge-warning text-dark' :
+                                                  (${#strings.equals(tarea.prioridad, 'BAJA')} ? 'badge-success' : 'badge-secondary'))">
+                            </span>
+                        </p>
+                        <p class="card-text mb-0">
+                            <strong>Fecha límite:</strong>
+                            <span th:text="${tarea.fechaLimite}"
+                                  th:classappend="${tarea.fechaLimiteProxima} ? 'text-danger font-weight-bold' : ''">
+                            </span>
+                            <span th:if="${tarea.fechaLimiteProxima}" class="badge badge-pill badge-warning ml-2">
+                                ⚠️ Urgente
+                            </span>
+                        </p>
+                    </div>
+                    <div class="mt-3 text-right">
+                        <button class="btn btn-danger btn-sm"
+                                data-toggle="modal"
+                                data-target="#confirmarEliminacionModal"
+                                th:attr="data-id=${tarea.id}">Borrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p>
+        <a class="btn btn-primary" th:href="@{/usuarios/{id}/tareas/nueva(id=${usuario.id})}">Nueva tarea</a>
+        <a class="btn btn-link" href="/logout">Salir</a>
+    </p>
 
     <div class="row mt-2">
         <div class="col">
@@ -121,10 +118,9 @@
   </div>
 </div>
 
-<!-- Fragmento JavaScript -->
+<!-- Fragmento para incluir scripts comunes -->
 <div th:replace="fragments::javascript"></div>
 
-<!-- Scripts funcionales -->
 <script>
     let idTareaAEliminar = null;
 
@@ -185,23 +181,23 @@
         const filtroTitulo = document.getElementById("filtroTitulo");
         const filtroPrioridad = document.getElementById("filtroPrioridad");
         const filtroFecha = document.getElementById("filtroFecha");
-        const filas = document.querySelectorAll("tbody tr");
+        const tarjetas = document.querySelectorAll(".col-md-4[data-titulo]");
 
         function aplicarFiltros() {
             const titulo = filtroTitulo.value.toLowerCase();
             const prioridad = filtroPrioridad.value;
             const fecha = filtroFecha.value;
 
-            filas.forEach(fila => {
-                const tituloFila = fila.getAttribute("data-titulo").toLowerCase();
-                const prioridadFila = fila.getAttribute("data-prioridad");
-                const fechaFila = fila.getAttribute("data-fecha");
+            tarjetas.forEach(card => {
+                const tituloCard = card.getAttribute("data-titulo").toLowerCase();
+                const prioridadCard = card.getAttribute("data-prioridad");
+                const fechaCard = card.getAttribute("data-fecha");
 
-                const coincideTitulo = titulo === "" || tituloFila.includes(titulo);
-                const coincidePrioridad = prioridad === "" || prioridadFila === prioridad;
-                const coincideFecha = fecha === "" || fechaFila === fecha;
+                const coincideTitulo = titulo === "" || tituloCard.includes(titulo);
+                const coincidePrioridad = prioridad === "" || prioridadCard === prioridad;
+                const coincideFecha = fecha === "" || fechaCard === fecha;
 
-                fila.style.display = (coincideTitulo && coincidePrioridad && coincideFecha) ? "" : "none";
+                card.style.display = (coincideTitulo && coincidePrioridad && coincideFecha) ? "" : "none";
             });
         }
 
