@@ -21,6 +21,7 @@
                     <th>Id</th>
                     <th>Tarea</th>
                     <th>Prioridad</th>
+                    <th>Fecha Límite</th>
                     <th>Accion</th>
                 </tr>
                 </thead>
@@ -36,6 +37,16 @@
                                             (${#strings.equals(tarea.prioridad, 'BAJA')} ? 'badge-success' : 'badge-secondary'))">
                         </span>
                     </td>
+                    <td>
+                        <span th:text="${tarea.fechaLimite}"
+                              th:classappend="${tarea.fechaLimiteProxima} ? 'text-danger font-weight-bold' : ''">
+                        </span>
+                    
+                        <span th:if="${tarea.fechaLimiteProxima}" class="badge badge-pill badge-warning ml-2" title="¡Esta tarea vence pronto!">
+                            ⚠️ Urgente
+                        </span>
+                    </td>
+                    
                     <td><a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}">editar</a>
                         <button class="btn btn-danger btn-xs" onmouseover="" style="cursor: pointer;"
                            th:onclick="'del(\'/tareas/' + ${tarea.id} + '\')'">borrar</button>

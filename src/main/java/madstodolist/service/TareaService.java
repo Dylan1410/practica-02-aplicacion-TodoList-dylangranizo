@@ -32,6 +32,7 @@ public class TareaService {
     @Autowired
     private ModelMapper modelMapper;
 
+    // Método original conservado
     @Transactional
     public TareaData nuevaTareaUsuario(Long idUsuario, String tituloTarea) {
         logger.debug("Añadiendo tarea " + tituloTarea + " al usuario " + idUsuario);
@@ -40,8 +41,22 @@ public class TareaService {
             throw new TareaServiceException("Usuario " + idUsuario + " no existe al crear tarea " + tituloTarea);
         }
         Tarea tarea = new Tarea(usuario, tituloTarea);
-        // Establecemos prioridad por defecto si se desea (opcional)
-        tarea.setPrioridad(Prioridad.MEDIA); 
+        tarea.setPrioridad(Prioridad.MEDIA);
+        tareaRepository.save(tarea);
+        return modelMapper.map(tarea, TareaData.class);
+    }
+
+    // NUEVO método con soporte para fechaLimite y prioridad
+    @Transactional
+    public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
+        logger.debug("Añadiendo tarea con DTO al usuario " + idUsuario);
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            throw new TareaServiceException("Usuario " + idUsuario + " no existe al crear tarea " + tareaData.getTitulo());
+        }
+        Tarea tarea = new Tarea(usuario, tareaData.getTitulo());
+        tarea.setPrioridad(tareaData.getPrioridad() != null ? tareaData.getPrioridad() : Prioridad.MEDIA);
+        tarea.setFechaLimite(tareaData.getFechaLimite());
         tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);
     }
@@ -89,6 +104,7 @@ public class TareaService {
         }
         tarea.setTitulo(tareaData.getTitulo());
         tarea.setPrioridad(tareaData.getPrioridad());
+        tarea.setFechaLimite(tareaData.getFechaLimite()); // <-- NUEVO
         tarea = tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);
     }

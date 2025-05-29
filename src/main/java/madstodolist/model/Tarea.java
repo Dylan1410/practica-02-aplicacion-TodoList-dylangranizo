@@ -2,8 +2,10 @@ package madstodolist.model;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+
 
 @Entity
 @Table(name = "tareas")
@@ -36,6 +39,8 @@ public class Tarea implements Serializable {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+    @Column(name= "fecha_limite")
+    private LocalDate fechaLimite;
 
     // Constructor vacío necesario para JPA/Hibernate.
     public Tarea() {}
@@ -81,6 +86,12 @@ public class Tarea implements Serializable {
             this.usuario = usuario;
             usuario.addTarea(this);
         }
+    }
+    public LocalDate getFechaLimite() {
+        return fechaLimite;
+    }
+    public void setFechaLimite(LocalDate fechaLimite) {
+        this.fechaLimite = fechaLimite;
     }
 
     @Override

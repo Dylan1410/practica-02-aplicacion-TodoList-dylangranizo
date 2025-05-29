@@ -43,35 +43,31 @@ public class TareaController {
 
     @GetMapping("/usuarios/{id}/tareas/nueva")
     public String formNuevaTarea(@PathVariable(value="id") Long idUsuario,
-                                 @ModelAttribute TareaData tareaData, Model model,
+                                 @ModelAttribute TareaData tareaData,
+                                 Model model,
                                  HttpSession session) {
-
+    
         comprobarUsuarioLogeado(idUsuario);
-
+    
         UsuarioData usuario = usuarioService.findById(idUsuario);
         model.addAttribute("usuario", usuario);
-        model.addAttribute("prioridades", Prioridad.values());  // Para usar en el select del formulario
+        model.addAttribute("prioridades", Prioridad.values());
+        model.addAttribute("tareaData", tareaData);
+    
         return "formNuevaTarea";
     }
 
     @PostMapping("/usuarios/{id}/tareas/nueva")
     public String nuevaTarea(@PathVariable(value="id") Long idUsuario, @ModelAttribute TareaData tareaData,
-                             Model model, RedirectAttributes flash,
-                             HttpSession session) {
+                             Model model, RedirectAttributes flash, HttpSession session) {
 
         comprobarUsuarioLogeado(idUsuario);
 
-        TareaData tareaCreada = tareaService.nuevaTareaUsuario(idUsuario, tareaData.getTitulo());
-
-        // Asignar prioridad si fue indicada (porque en el método original se pone MEDIA por defecto)
-        if (tareaData.getPrioridad() != null) {
-            tareaCreada.setPrioridad(tareaData.getPrioridad());
-            tareaService.modificaTareaDesdeDTO(tareaCreada.getId(), tareaCreada);
-        }
+        tareaService.nuevaTareaUsuario(idUsuario, tareaData);
 
         flash.addFlashAttribute("mensaje", "Tarea creada correctamente");
         return "redirect:/usuarios/" + idUsuario + "/tareas";
-     }
+    }
 
     @GetMapping("/usuarios/{id}/tareas")
     public String listadoTareas(@PathVariable(value="id") Long idUsuario, Model model, HttpSession session) {
@@ -97,15 +93,17 @@ public class TareaController {
         comprobarUsuarioLogeado(tarea.getUsuarioId());
 
         model.addAttribute("tarea", tarea);
-        model.addAttribute("prioridades", Prioridad.values());  // Para mostrar en el formulario
+        model.addAttribute("prioridades", Prioridad.values());
         tareaData.setTitulo(tarea.getTitulo());
         tareaData.setPrioridad(tarea.getPrioridad());
+        tareaData.setFechaLimite(tarea.getFechaLimite());  // <- Nuevo
         return "formEditarTarea";
     }
 
     @PostMapping("/tareas/{id}/editar")
     public String grabaTareaModificada(@PathVariable(value="id") Long idTarea, @ModelAttribute TareaData tareaData,
                                        Model model, RedirectAttributes flash, HttpSession session) {
+
         TareaData tarea = tareaService.findById(idTarea);
         if (tarea == null) {
             throw new TareaNotFoundException();

@@ -2,11 +2,14 @@ package madstodolist.dto;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import madstodolist.model.Prioridad;
 
-// Data Transfer Object para la clase Tarea
 public class TareaData implements Serializable {
 
     @Serial
@@ -14,11 +17,22 @@ public class TareaData implements Serializable {
 
     private Long id;
     private String titulo;
-    private Long usuarioId; // ID del usuario asociado
-    private Prioridad prioridad; // NUEVO CAMPO
+    private Long usuarioId;
+    private Prioridad prioridad;
 
-    // Getters y setters
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate fechaLimite;
 
+    // ===== NUEVO MÉTODO =====
+    public boolean isFechaLimiteProxima() {
+        if (fechaLimite == null) return false;
+    
+        LocalDate hoy = LocalDate.now();
+        long dias = ChronoUnit.DAYS.between(hoy, fechaLimite);
+    
+        return dias >= 0 && dias <= 2;
+    }
+    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -51,8 +65,15 @@ public class TareaData implements Serializable {
         this.prioridad = prioridad;
     }
 
-    // equals y hashCode basados en id
+    public LocalDate getFechaLimite() {
+        return fechaLimite;
+    }
 
+    public void setFechaLimite(LocalDate fechaLimite) {
+        this.fechaLimite = fechaLimite;
+    }
+
+    // equals y hashCode por ID
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
