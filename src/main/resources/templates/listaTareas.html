@@ -66,7 +66,6 @@
                         <span th:text="${tarea.fechaLimite}"
                               th:classappend="${tarea.fechaLimiteProxima} ? 'text-danger font-weight-bold' : ''">
                         </span>
-
                         <span th:if="${tarea.fechaLimiteProxima}" class="badge badge-pill badge-warning ml-2" title="¡Esta tarea vence pronto!">
                             ⚠️ Urgente
                         </span>
@@ -74,7 +73,9 @@
                     <td>
                         <a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}">editar</a>
                         <button class="btn btn-danger btn-xs" style="cursor: pointer;"
-                                th:onclick="'del(\'/tareas/' + ${tarea.id} + '\')'">borrar</button>
+                                data-toggle="modal"
+                                data-target="#confirmarEliminacionModal"
+                                th:attr="data-id=${tarea.id}">borrar</button>
                     </td>
                 </tr>
                 </tbody>
@@ -99,18 +100,45 @@
     </div>
 </div>
 
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="confirmarEliminacionModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLabel">Confirmar eliminación</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro/a de que deseas eliminar esta tarea?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button id="btnConfirmarEliminar" type="button" class="btn btn-danger">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Fragmento JavaScript -->
-<div th:replace="fragments::javascript"/>
+<div th:replace="fragments::javascript"></div>
 
 <!-- Scripts funcionales -->
-<script type="text/javascript">
-    function del(urlBorrar) {
-        if (confirm('¿Estás seguro/a de que quieres borrar la tarea?')) {
-            fetch(urlBorrar, {
-                method: 'DELETE'
-            }).then((res) => location.reload());
-        }
-    }
+<script>
+    let idTareaAEliminar = null;
+
+    $('#confirmarEliminacionModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        idTareaAEliminar = button.data('id');
+    });
+
+    document.getElementById('btnConfirmarEliminar').addEventListener('click', function () {
+        if (!idTareaAEliminar) return;
+        fetch(`/tareas/${idTareaAEliminar}`, {
+            method: 'DELETE'
+        }).then(() => location.reload());
+    });
 </script>
 
 <script>
