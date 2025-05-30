@@ -54,7 +54,7 @@ public class TareaService {
             throw new TareaServiceException("Usuario " + idUsuario + " no existe al crear tarea " + tareaData.getTitulo());
         }
         Tarea tarea = new Tarea(usuario, tareaData.getTitulo());
-        tarea.setPrioridad(tareaData.getPrioridad() != null ? tareaData.getPrioridad() : Prioridad.MEDIA);
+        tarea.setPrioridad(tareaData.getPrioridad());
         tarea.setFechaLimite(tareaData.getFechaLimite());
         tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);

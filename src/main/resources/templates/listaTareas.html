@@ -15,6 +15,7 @@
         </div>
     </div>
 
+    <!-- 🔍 Filtros -->
     <div class="row mt-3 mb-3">
         <div class="col-md-4">
             <input type="text" id="filtroTitulo" class="form-control" placeholder="🔍 Buscar por título...">
@@ -31,59 +32,70 @@
             <input type="date" id="filtroFecha" class="form-control" placeholder="📅 Filtrar por fecha límite">
         </div>
     </div>
+<!-- 📝 Lista de tareas -->
+<div class="row">
 
-    <div class="row" th:if="${tareas}">
-        <div class="col-md-4 mb-4"
-             th:each="tarea : ${tareas}"
-             th:attr="data-id=${tarea.id}, data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad}, data-fecha=${tarea.fechaLimite}">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
+    <!-- Tareas existentes -->
+    <div class="col-md-4 mb-4"
+         th:each="tarea : ${tareas}"
+         th:attr="data-id=${tarea.id}, data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad.name()}, data-fecha=${tarea.fechaLimite}">
+        <div class="card shadow-sm h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
 
-                    <!-- TÍTULO editable -->
-                    <div th:attr="data-id=${tarea.id}" class="editable-titulo d-flex align-items-center justify-content-between w-100 mb-2">
-                        <span class="titulo-texto flex-grow-1" th:text="${tarea.titulo}"></span>
-                        <input class="form-control form-control-sm titulo-input d-none flex-grow-1" type="text" th:value="${tarea.titulo}">
-                        <button type="button" class="btn btn-sm btn-outline-secondary ml-2">✏️</button>
-                    </div>
-
-                    <!-- PRIORIDAD editable -->
-                    <div class="mb-2">
-                        <label class="font-weight-bold mb-1">Prioridad:</label>
-                        <select class="form-control form-control-sm editable-prioridad" th:attr="data-id=${tarea.id}">
-                            <option value="BAJA" th:selected="${tarea.prioridad == 'BAJA'}">🟢 Baja</option>
-                            <option value="MEDIA" th:selected="${tarea.prioridad == 'MEDIA'}">🟡 Media</option>
-                            <option value="ALTA" th:selected="${tarea.prioridad == 'ALTA'}">🔴 Alta</option>
-                        </select>
-                    </div>
-
-                    <!-- FECHA editable -->
-                    <div class="mb-2">
-                        <label class="font-weight-bold mb-1">Fecha límite:</label>
-                        <input type="date" class="form-control form-control-sm editable-fecha" th:value="${tarea.fechaLimite}" th:attr="data-id=${tarea.id}">
-                        <span class="badge badge-pill badge-warning mt-2 urgente-badge"
-                              th:if="${tarea.fechaLimiteProxima}" style="display: inline;">⚠️ Urgente</span>
-                        <span class="badge badge-pill badge-warning mt-2 urgente-badge"
-                              th:unless="${tarea.fechaLimiteProxima}" style="display: none;">⚠️ Urgente</span>
-                    </div>
-
-                    <!-- BORRAR -->
-                    <div class="text-right mt-2">
-                        <button class="btn btn-danger btn-sm"
-                                data-toggle="modal"
-                                data-target="#confirmarEliminacionModal"
-                                th:attr="data-id=${tarea.id}">Borrar</button>
-                    </div>
-
+                <!-- TÍTULO editable -->
+                <div th:attr="data-id=${tarea.id}" class="editable-titulo d-flex align-items-center justify-content-between w-100 mb-2">
+                    <span class="titulo-texto flex-grow-1" th:text="${tarea.titulo}"></span>
+                    <input class="form-control form-control-sm titulo-input d-none flex-grow-1" type="text" th:value="${tarea.titulo}">
+                    <button type="button" class="btn btn-sm btn-outline-secondary ml-2">✏️</button>
                 </div>
+
+           <!-- PRIORIDAD editable -->
+<div class="mb-2">
+    <label class="font-weight-bold mb-1">Prioridad:</label>
+    <select class="form-control form-control-sm editable-prioridad" th:attr="data-id=${tarea.id}">
+        <option value="BAJA" th:selected="${tarea.prioridad.name() == 'BAJA'}">🟢 Baja</option>
+        <option value="MEDIA" th:selected="${tarea.prioridad.name() == 'MEDIA'}">🟡 Media</option>
+        <option value="ALTA" th:selected="${tarea.prioridad.name() == 'ALTA'}">🔴 Alta</option>
+    </select>
+</div>
+
+
+                <!-- FECHA editable -->
+                <div class="mb-2">
+                    <label class="font-weight-bold mb-1">Fecha límite:</label>
+                    <input type="date" class="form-control form-control-sm editable-fecha" th:value="${tarea.fechaLimite}" th:attr="data-id=${tarea.id}">
+                    <span class="badge badge-pill badge-warning mt-2 urgente-badge"
+                          th:if="${tarea.fechaLimiteProxima}" style="display: inline;">⚠️ Urgente</span>
+                    <span class="badge badge-pill badge-warning mt-2 urgente-badge"
+                          th:unless="${tarea.fechaLimiteProxima}" style="display: none;">⚠️ Urgente</span>
+                </div>
+
+                <!-- BORRAR -->
+                <div class="text-right mt-2">
+                    <button class="btn btn-danger btn-sm"
+                            data-toggle="modal"
+                            data-target="#confirmarEliminacionModal"
+                            th:attr="data-id=${tarea.id}">Borrar</button>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <p>
-        <a class="btn btn-primary" th:href="@{/usuarios/{id}/tareas/nueva(id=${usuario.id})}">Nueva tarea</a>
-        <a class="btn btn-link" href="/logout">Salir</a>
-    </p>
+    <!-- ➕ BOTÓN DE NUEVA TAREA COMO TARJETA -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100 d-flex justify-content-center align-items-center text-center" style="opacity: 0.5; cursor: pointer;"
+             data-toggle="modal" data-target="#modalNuevaTarea">
+            <div class="card-body">
+                <h2 style="font-size: 48px;">➕</h2>
+                <p class="mt-2 mb-0">Nueva tarea</p>
+            </div>
+        </div>
+    </div>
 
+</div>
+
+    <!-- ✅ Flash mensaje -->
     <div class="row mt-2">
         <div class="col">
             <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${!#strings.isEmpty(mensaje)}">
@@ -96,7 +108,7 @@
     </div>
 </div>
 
-<!-- Modal de Confirmación de Eliminación -->
+<!-- Modal de confirmación de eliminación -->
 <div class="modal fade" id="confirmarEliminacionModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -116,6 +128,49 @@
         </div>
     </div>
 </div>
+<!-- Modal para crear nueva tarea -->
+<div class="modal fade" id="modalNuevaTarea" tabindex="-1" role="dialog" aria-labelledby="nuevaTareaLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <form th:action="@{/usuarios/{id}/tareas/nueva(id=${usuario.id})}" method="post" th:object="${tareaData}" class="modal-content">
+  
+        <div class="modal-header">
+          <h5 class="modal-title" id="nuevaTareaLabel">➕ Crear nueva tarea</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+  
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="tituloTarea">Título</label>
+            <input type="text" class="form-control" id="tituloTarea" placeholder="Escribe un título" th:field="*{titulo}" required>
+          </div>
+  
+          <div class="form-group">
+            <label for="prioridadTarea">Prioridad</label>
+            <select class="form-control" id="prioridadTarea" th:field="*{prioridad}">
+                <option value="BAJA">🟢 Baja</option>
+                <option value="MEDIA">🟡 Media</option>
+                <option value="ALTA">🔴 Alta</option>
+            </select>
+          </div>
+  
+          <div class="form-group">
+            <label for="fechaLimiteTarea">Fecha límite</label>
+            <input type="date" class="form-control" id="fechaLimiteTarea" th:field="*{fechaLimite}"
+                   min="[[${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}]]">
+          </div>
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar tarea</button>
+        </div>
+  
+      </form>
+    </div>
+  </div>
+  
 
 <!-- Scripts comunes -->
 <div th:replace="fragments::javascript"></div>

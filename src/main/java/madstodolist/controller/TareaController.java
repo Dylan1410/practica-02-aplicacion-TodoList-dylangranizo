@@ -58,28 +58,35 @@ public class TareaController {
     }
 
     @PostMapping("/usuarios/{id}/tareas/nueva")
-    public String nuevaTarea(@PathVariable(value="id") Long idUsuario, @ModelAttribute TareaData tareaData,
-                             Model model, RedirectAttributes flash, HttpSession session) {
-
-        comprobarUsuarioLogeado(idUsuario);
-
-        tareaService.nuevaTareaUsuario(idUsuario, tareaData);
-
-        flash.addFlashAttribute("mensaje", "Tarea creada correctamente");
-        return "redirect:/usuarios/" + idUsuario + "/tareas";
+    public String nuevaTarea(@PathVariable Long id,
+                             @ModelAttribute("tareaData") TareaData tareaData,
+                             RedirectAttributes flash) {
+    
+        // Asegura que se use el método que recibe el DTO con prioridad y fecha
+        tareaService.nuevaTareaUsuario(id, tareaData);
+    
+        flash.addFlashAttribute("mensaje", "Tarea creada con éxito.");
+        return "redirect:/usuarios/" + id + "/tareas";
     }
-
+    
     @GetMapping("/usuarios/{id}/tareas")
     public String listadoTareas(@PathVariable(value="id") Long idUsuario, Model model, HttpSession session) {
-
+    
         comprobarUsuarioLogeado(idUsuario);
-
+    
         UsuarioData usuario = usuarioService.findById(idUsuario);
         List<TareaData> tareas = tareaService.allTareasUsuario(idUsuario);
+        
         model.addAttribute("usuario", usuario);
         model.addAttribute("tareas", tareas);
+        
+        // NUEVOS ATRIBUTOS PARA EL FORMULARIO RÁPIDO
+        model.addAttribute("tareaData", new TareaData());
+        model.addAttribute("prioridades", Prioridad.values());
+    
         return "listaTareas";
     }
+    
 
     @GetMapping("/tareas/{id}/editar")
     public String formEditaTarea(@PathVariable(value="id") Long idTarea, @ModelAttribute TareaData tareaData,
