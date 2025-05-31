@@ -35,6 +35,8 @@ public class Usuario implements Serializable {
     @Column(name = "fecha_nacimiento")
     @Temporal(TemporalType.DATE)
     private Date fechaNacimiento;
+    @Column(name = "foto_url")
+    private String fotoUrl;
 
     // La relación es lazy por defecto,
     // es necesario acceder a la lista de tareas para que se carguen
@@ -97,7 +99,6 @@ public class Usuario implements Serializable {
     public Set<Tarea> getTareas() {
         return tareas;
     }
-
     // Método helper para añadir una tarea a la lista y establecer la relación inversa
     public void addTarea(Tarea tarea) {
         // Si la tarea ya está en la lista, no la añadimos
@@ -108,6 +109,14 @@ public class Usuario implements Serializable {
         if (tarea.getUsuario() != this) {
             tarea.setUsuario(this);
         }
+    }
+    
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+    
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 
     @Override

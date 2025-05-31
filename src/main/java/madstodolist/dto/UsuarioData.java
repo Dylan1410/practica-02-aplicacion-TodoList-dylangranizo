@@ -11,7 +11,7 @@ public class UsuarioData {
     private String nombre;
     private String password;
     private Date fechaNacimiento;
-
+    private String fotoUrl;
     // Getters y setters
 
     public Long getId() {
@@ -49,6 +49,14 @@ public class UsuarioData {
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+    
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
+    }
+    
 
     // Sobreescribimos equals y hashCode para que dos usuarios sean iguales
     // si tienen el mismo ID (ignoramos el resto de atributos)
