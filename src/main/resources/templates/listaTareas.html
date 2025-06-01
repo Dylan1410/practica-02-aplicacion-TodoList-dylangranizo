@@ -62,7 +62,7 @@
     <!-- Tareas existentes -->
     <div class="col-md-4 mb-4"
     th:each="tarea : ${tareas}"
-    th:attr="data-id=${tarea.id}, data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad.name()}, data-fecha=${tarea.fechaLimite}">
+    th:attr="data-id=${tarea.id}, data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad?.name()}, data-fecha=${tarea.fechaLimite}">
    <div class="card shadow-sm h-100"
         th:classappend="${tarea.completada == true} ? ' tarea-completada-card' : ''">
        <div class="card-body d-flex flex-column justify-content-between">
@@ -120,9 +120,9 @@
            <div class="mb-2">
                <label class="font-weight-bold mb-1">Prioridad:</label>
                <select class="form-control form-control-sm editable-prioridad" th:attr="data-id=${tarea.id}">
-                   <option value="BAJA" th:selected="${tarea.prioridad.name() == 'BAJA'}">🟢 Baja</option>
-                   <option value="MEDIA" th:selected="${tarea.prioridad.name() == 'MEDIA'}">🟡 Media</option>
-                   <option value="ALTA" th:selected="${tarea.prioridad.name() == 'ALTA'}">🔴 Alta</option>
+                   <option value="BAJA" th:selected="${tarea.prioridad?.name() == 'BAJA'}">🟢 Baja</option>
+                   <option value="MEDIA" th:selected="${tarea.prioridad?.name() == 'MEDIA'}">🟡 Media</option>
+                   <option value="ALTA" th:selected="${tarea.prioridad?.name() == 'ALTA'}">🔴 Alta</option>
                </select>
            </div>
 
