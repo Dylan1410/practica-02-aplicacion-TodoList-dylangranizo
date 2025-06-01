@@ -57,71 +57,125 @@
         </div>
     </div>
 <!-- 📝 Lista de tareas -->
-<div class="row">
+<div class="row d-flex flex-wrap">
 
     <!-- Tareas existentes -->
     <div class="col-md-4 mb-4"
-         th:each="tarea : ${tareas}"
-         th:attr="data-id=${tarea.id}, data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad.name()}, data-fecha=${tarea.fechaLimite}">
-        <div class="card shadow-sm h-100">
-            <div class="card-body d-flex flex-column justify-content-between">
+    th:each="tarea : ${tareas}"
+    th:attr="data-id=${tarea.id}, data-titulo=${tarea.titulo}, data-prioridad=${tarea.prioridad.name()}, data-fecha=${tarea.fechaLimite}">
+   <div class="card shadow-sm h-100"
+        th:classappend="${tarea.completada == true} ? ' tarea-completada-card' : ''">
+       <div class="card-body d-flex flex-column justify-content-between">
 
-                <!-- TÍTULO editable -->
-                <div th:attr="data-id=${tarea.id}" class="editable-titulo d-flex align-items-center justify-content-between w-100 mb-2">
-                    <span class="titulo-texto flex-grow-1" th:text="${tarea.titulo}"></span>
-                    <input class="form-control form-control-sm titulo-input d-none flex-grow-1" type="text" th:value="${tarea.titulo}">
-                    <button type="button" class="btn btn-sm btn-outline-secondary ml-2">✏️</button>
-                </div>
-<!-- DESCRIPCIÓN -->
-<div th:if="${tarea.descripcion}" th:utext="${tarea.descripcion}" class="mb-2 small"></div>
-
-           <!-- PRIORIDAD editable -->
-<div class="mb-2">
-    <label class="font-weight-bold mb-1">Prioridad:</label>
-    <select class="form-control form-control-sm editable-prioridad" th:attr="data-id=${tarea.id}">
-        <option value="BAJA" th:selected="${tarea.prioridad.name() == 'BAJA'}">🟢 Baja</option>
-        <option value="MEDIA" th:selected="${tarea.prioridad.name() == 'MEDIA'}">🟡 Media</option>
-        <option value="ALTA" th:selected="${tarea.prioridad.name() == 'ALTA'}">🔴 Alta</option>
-    </select>
+<!-- ✔️ Sello de completado mejorado -->
+<div class="text-right mb-2 finalizada-sello" th:classappend="${!tarea.completada} ? 'd-none'">
+    <span class="badge badge-pill badge-completada-animada">
+        🎉 Done
+    </span>
 </div>
 
 
-                <!-- FECHA editable -->
-                <div class="mb-2">
-                    <label class="font-weight-bold mb-1">Fecha límite:</label>
-                    <input type="date" class="form-control form-control-sm editable-fecha" th:value="${tarea.fechaLimite}" th:attr="data-id=${tarea.id}">
-                    <span class="badge badge-pill badge-warning mt-2 urgente-badge"
-                          th:if="${tarea.fechaLimiteProxima}" style="display: inline;">⚠️ Urgente</span>
-                    <span class="badge badge-pill badge-warning mt-2 urgente-badge"
-                          th:unless="${tarea.fechaLimiteProxima}" style="display: none;">⚠️ Urgente</span>
-                </div>
+<!-- Checkbox de completado mejorado -->
+<div class="form-check mb-3 d-flex align-items-center" style="gap: 10px;">
+    <input class="form-check-input checkbox-completada shadow"
+           type="checkbox"
+           th:checked="${tarea.completada}"
+           th:attr="data-id=${tarea.id}"
+           style="transform: scale(1.5); cursor: pointer;">
+    <label class="form-check-label font-weight-bold" style="font-size: 1.25rem; cursor: pointer;">
+        🤗 ¿Got it?
+    </label>
+    <style>
+        .badge-completada-animada {
+            background-color: #28a745;
+            color: white;
+            font-size: 0.95rem;
+            padding: 0.6em 1em;
+            border-radius: 1em;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0px rgba(40, 167, 69, 0.5); }
+            50% { box-shadow: 0 0 12px rgba(40, 167, 69, 0.8); }
+            100% { box-shadow: 0 0 0px rgba(40, 167, 69, 0.5); }
+        }
+        </style>        
+</div>
 
-                <!-- BORRAR -->
-                <div class="text-right mt-2">
-                    <button class="btn btn-danger btn-sm"
-                            data-toggle="modal"
-                            data-target="#confirmarEliminacionModal"
-                            th:attr="data-id=${tarea.id}">Borrar</button>
-                </div>
+<!-- Título editable -->
+<div class="editable-titulo d-flex align-items-center justify-content-between w-100 mb-2"
+     th:classappend="${tarea.completada} ? ' tarea-completada' : ''"
+     th:attr="data-id=${tarea.id}">
+    <span class="titulo-texto flex-grow-1" th:text="${tarea.titulo}"></span>
+    <input class="form-control form-control-sm titulo-input d-none flex-grow-1" type="text" th:value="${tarea.titulo}">
+    <button type="button" class="btn btn-sm btn-outline-secondary ml-2">✏️</button>
+</div>
 
+           <!-- Descripción -->
+           <div th:if="${tarea.descripcion}" th:utext="${tarea.descripcion}" class="mb-2 small"></div>
+
+           <!-- Prioridad -->
+           <div class="mb-2">
+               <label class="font-weight-bold mb-1">Prioridad:</label>
+               <select class="form-control form-control-sm editable-prioridad" th:attr="data-id=${tarea.id}">
+                   <option value="BAJA" th:selected="${tarea.prioridad.name() == 'BAJA'}">🟢 Baja</option>
+                   <option value="MEDIA" th:selected="${tarea.prioridad.name() == 'MEDIA'}">🟡 Media</option>
+                   <option value="ALTA" th:selected="${tarea.prioridad.name() == 'ALTA'}">🔴 Alta</option>
+               </select>
+           </div>
+
+           <!-- Fecha límite -->
+           <div class="mb-2">
+               <label class="font-weight-bold mb-1">Fecha límite:</label>
+               <input type="date" class="form-control form-control-sm editable-fecha"
+                      th:value="${tarea.fechaLimite}" th:attr="data-id=${tarea.id}">
+               <span class="badge badge-pill badge-warning mt-2 urgente-badge"
+                     th:if="${tarea.fechaLimiteProxima}" style="display: inline;">⚠️ Urgente</span>
+               <span class="badge badge-pill badge-warning mt-2 urgente-badge"
+                     th:unless="${tarea.fechaLimiteProxima}" style="display: none;">⚠️ Urgente</span>
+           </div>
+
+           <!-- Borrar -->
+           <div class="text-right mt-2">
+               <button class="btn btn-danger btn-sm"
+                       data-toggle="modal"
+                       data-target="#confirmarEliminacionModal"
+                       th:attr="data-id=${tarea.id}">Borrar</button>
+           </div>
+       </div>
+   </div>
+</div>
+    <!-- ➕ BOTÓN DE NUEVA TAREA COMO TARJETA -->
+    <div class="col-md-4 mb-4" style="order: 999;">
+        <div class="card shadow-sm h-100 text-center"
+             style="cursor: pointer; background-color: #f0f8ff;"
+             data-toggle="modal" data-target="#modalNuevaTarea">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <div>
+                    <h2 style="font-size: 64px; margin: 0; color: #443366;">✍️</h2>
+                    <p class="mt-2 mb-0 text-muted">Nueva tarea</p>
+                </div>
             </div>
         </div>
     </div>
 
-<!-- ➕ BOTÓN DE NUEVA TAREA COMO TARJETA -->
-<div class="col-md-4 mb-4">
-    <div class="card shadow-sm h-100 text-center"
-         style="cursor: pointer; background-color: #f0f8ff;"
-         data-toggle="modal" data-target="#modalNuevaTarea">
-        <div class="card-body d-flex flex-column justify-content-center align-items-center">
-            <div>
-                <h2 style="font-size: 64px; margin: 0; color: #443366;">✍️</h2>
-                <p class="mt-2 mb-0 text-muted">Nueva tarea</p>
-            </div>
-        </div>
-    </div>
-</div>
+</div> <!-- Fin de la fila de tareas -->
 
+<!-- Estilos para tareas completadas -->
+<style>
+.tarea-completada .titulo-texto {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.tarea-completada-card {
+    background-color: #f0f0f0 !important;
+    opacity: 0.8;
+    transition: all 0.3s ease-in-out;
+}
+</style>
 
 <!-- ✅ Flash mensaje centrado abajo -->
 <div th:if="${!#strings.isEmpty(mensaje)}"
@@ -389,6 +443,39 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('descripcion').value = quill.root.innerHTML;
     });
 });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.checkbox-completada').change(function () {
+            const idTarea = $(this).data('id');
+            const completada = $(this).is(':checked');
+            const card = $(`[data-id='${idTarea}']`).closest('.col-md-4');
+            const cardBody = card.find('.card');
+            const titulo = card.find('.editable-titulo');
+
+            $.ajax({
+                url: '/api/tareas/' + idTarea + '/completada',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ completada: completada }),
+                success: function () {
+                    if (completada) {
+                        cardBody.addClass('tarea-completada-card');
+                        titulo.addClass('tarea-completada');
+
+                        // Muestra el sello
+                        card.find('.finalizada-sello').removeClass('d-none');
+                    } else {
+                        cardBody.removeClass('tarea-completada-card');
+                        titulo.removeClass('tarea-completada');
+
+                        // Oculta el sello
+                        card.find('.finalizada-sello').addClass('d-none');
+                    }
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>

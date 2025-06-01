@@ -6,9 +6,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import madstodolist.service.TareaService;
@@ -59,4 +61,14 @@ public class TareaRestController {
         tareaService.actualizarDescripcion(id, descripcion);
         return ResponseEntity.ok().build();
     }
+
+        @PostMapping("/{id}/completada")  // ✅ ruta relativa correcta
+        @ResponseBody
+        public ResponseEntity<?> actualizarCompletada(@PathVariable Long id, @RequestBody Map<String, Boolean> payload) {
+            boolean completada = payload.get("completada");
+            tareaService.actualizarEstadoCompletada(id, completada);
+            return ResponseEntity.ok().build();
+        }
+
+
 }

@@ -42,24 +42,26 @@ public class TareaService {
         }
         Tarea tarea = new Tarea(usuario, tituloTarea);
         tarea.setPrioridad(Prioridad.MEDIA);
+        tarea.setCompletada(false);
         tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);
     }
 
     @Transactional
-    public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
-        logger.debug("Añadiendo tarea con DTO al usuario " + idUsuario);
-        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
-        if (usuario == null) {
-            throw new TareaServiceException("Usuario " + idUsuario + " no existe al crear tarea " + tareaData.getTitulo());
-        }
-        Tarea tarea = new Tarea(usuario, tareaData.getTitulo());
-        tarea.setPrioridad(tareaData.getPrioridad());
-        tarea.setFechaLimite(tareaData.getFechaLimite());
-        tarea.setDescripcion(tareaData.getDescripcion());
-        tareaRepository.save(tarea);
-        return modelMapper.map(tarea, TareaData.class);
+public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
+    logger.debug("Añadiendo tarea con DTO al usuario " + idUsuario);
+    Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+    if (usuario == null) {
+        throw new TareaServiceException("Usuario " + idUsuario + " no existe al crear tarea " + tareaData.getTitulo());
     }
+    Tarea tarea = new Tarea(usuario, tareaData.getTitulo());
+    tarea.setPrioridad(tareaData.getPrioridad());
+    tarea.setFechaLimite(tareaData.getFechaLimite());
+    tarea.setDescripcion(tareaData.getDescripcion());
+    tarea.setCompletada(false);
+    tareaRepository.save(tarea);
+    return modelMapper.map(tarea, TareaData.class);
+}
 
     @Transactional(readOnly = true)
     public List<TareaData> allTareasUsuario(Long idUsuario) {
@@ -68,12 +70,20 @@ public class TareaService {
         if (usuario == null) {
             throw new TareaServiceException("Usuario " + idUsuario + " no existe al listar tareas ");
         }
+    
         List<TareaData> tareas = usuario.getTareas().stream()
-                .map(tarea -> modelMapper.map(tarea, TareaData.class))
+                .map(tarea -> {
+                    TareaData dto = modelMapper.map(tarea, TareaData.class);
+                    dto.setCompletada(tarea.isCompletada());
+                    return dto;
+                })
                 .collect(Collectors.toList());
+    
         Collections.sort(tareas, (a, b) -> a.getId() < b.getId() ? -1 : a.getId().equals(b.getId()) ? 0 : 1);
+    
         return tareas;
     }
+    
 
     @Transactional(readOnly = true)
     public TareaData findById(Long tareaId) {
@@ -160,5 +170,11 @@ public class TareaService {
         tarea.setDescripcion(descripcion);
         tareaRepository.save(tarea);
     }
-    
+    @Transactional
+public void actualizarEstadoCompletada(Long idTarea, boolean completada) {
+    Tarea tarea = tareaRepository.findById(idTarea)
+            .orElseThrow(() -> new TareaServiceException("Tarea no encontrada"));
+    tarea.setCompletada(completada);
+    tareaRepository.save(tarea);
+    }
 }
