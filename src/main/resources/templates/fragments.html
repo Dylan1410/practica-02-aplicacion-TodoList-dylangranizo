@@ -7,36 +7,55 @@
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
 
+<!-- fragments.html -->
 <div th:fragment="javascript">
+    <!-- Librerías base -->
     <script th:src="@{/js/jquery.min.js}"></script>
     <script th:src="@{/js/popper.min.js}"></script>
     <script th:src="@{/js/bootstrap.min.js}"></script>
+
+    <!-- Scripts personalizados -->
+    <script th:src="@{/js/tareas-edit.js}"></script>
+    <script th:src="@{/js/tareas-filtros.js}"></script>
+    <script th:src="@{/js/tareas-eliminar.js}"></script>
+    <script th:src="@{/js/flash-auto-hide.js}"></script>
 </div>
+
 
 <!-- Navbar Fragment -->
 <div th:fragment="navbar(usuario)">
-    <div class="d-flex flex-column bg-dark text-white align-items-center py-4" style="min-height: 100vh; width: 100%;">
-        
-        <h4 class="mb-4 text-center">📝 ToDo List</h4>
+    <div class="d-flex flex-column align-items-center text-white px-3 py-4 w-100"
+         style="min-height: 100vh; background: linear-gradient(to bottom, #66d2e2, #4bb1c7); font-family: 'Segoe UI', sans-serif;">
+
+        <!-- Título -->
+        <h4 class="mb-4 text-center font-weight-bold">📝 ToDoList</h4>
 
         <!-- Foto de perfil -->
-        <div class="rounded-circle bg-secondary mb-3" style="width: 100px; height: 100px; overflow: hidden;">
+        <div class="rounded-circle mb-3 shadow" style="width: 100px; height: 100px; overflow: hidden; border: 2px solid white;">
             <img th:if="${usuario.fotoUrl}" th:src="@{${usuario.fotoUrl}}"
                  class="img-fluid h-100 w-100" style="object-fit: cover;">
-            <div th:unless="${usuario.fotoUrl}" class="d-flex justify-content-center align-items-center h-100 w-100 text-white">
+            <div th:unless="${usuario.fotoUrl}" class="d-flex justify-content-center align-items-center h-100 w-100 text-white bg-secondary">
                 <span style="font-size: 2rem;">👤</span>
             </div>
         </div>
 
-        <!-- Nombre del usuario -->
-        <div class="mb-4 text-center font-weight-bold" th:text="${usuario.nombre}"></div>
+        <!-- Nombre -->
+        <div class="mb-4 text-center font-weight-bold" th:text="${usuario.nombre}"
+             style="word-break: break-word; padding: 0 10px;"></div>
 
         <!-- Botones -->
-        <a class="btn btn-outline-light btn-sm mb-2 w-75 text-center" 
+        <a class="btn btn-outline-light btn-sm mb-2 w-100 text-center" 
            th:href="@{/usuarios/{id}/editar(id=${usuario.id})}">⚙️ Editar perfil</a>
-        <a class="btn btn-outline-light btn-sm w-75 text-center" href="/logout">🚪 Cerrar sesión</a>
+        <a class="btn btn-outline-light btn-sm w-100 text-center" href="/logout">🚪 Cerrar sesión</a>
+
+        <!-- Footer opcional -->
+        <div class="mt-auto pt-3 text-center" style="font-size: 0.8rem; opacity: 0.7;">
+            <hr style="border-color: rgba(255,255,255,0.3); width: 80%;">
+            <p class="mb-0">© 2025 ToDoList App.DylanGranizo</p>
+        </div>
     </div>
 </div>
+
 
 
 

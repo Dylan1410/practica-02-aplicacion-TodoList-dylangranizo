@@ -5,7 +5,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import madstodolist.service.TareaService;
 
@@ -43,6 +47,16 @@ public class TareaRestController {
             return ResponseEntity.badRequest().body("Fecha límite vacía");
         }
         tareaService.actualizarFechaLimite(id, LocalDate.parse(fechaLimite));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/descripcion")
+    public ResponseEntity<?> actualizarDescripcion(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String descripcion = payload.get("descripcion");
+        if (descripcion == null) {
+            return ResponseEntity.badRequest().body("Descripción vacía");
+        }
+        tareaService.actualizarDescripcion(id, descripcion);
         return ResponseEntity.ok().build();
     }
 }

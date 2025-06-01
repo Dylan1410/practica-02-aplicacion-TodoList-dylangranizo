@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -43,7 +44,8 @@ public class Tarea implements Serializable {
     private LocalDate fechaLimite;
     @Column(nullable = false)
     private boolean completada = false;
-
+    @Lob
+    private String descripcion;
     // Constructor vacío necesario para JPA/Hibernate.
     public Tarea() {}
 
@@ -100,6 +102,13 @@ public class Tarea implements Serializable {
     }
     public void setCompletada(boolean completada) {
         this.completada = completada;
+    }
+    public String getDescripcion() {
+        return descripcion;
+    }
+    
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     @Override

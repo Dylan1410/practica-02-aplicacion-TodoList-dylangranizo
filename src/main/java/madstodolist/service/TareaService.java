@@ -56,6 +56,7 @@ public class TareaService {
         Tarea tarea = new Tarea(usuario, tareaData.getTitulo());
         tarea.setPrioridad(tareaData.getPrioridad());
         tarea.setFechaLimite(tareaData.getFechaLimite());
+        tarea.setDescripcion(tareaData.getDescripcion());
         tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);
     }
@@ -104,6 +105,7 @@ public class TareaService {
         tarea.setTitulo(tareaData.getTitulo());
         tarea.setPrioridad(tareaData.getPrioridad());
         tarea.setFechaLimite(tareaData.getFechaLimite());
+        tarea.setDescripcion(tareaData.getDescripcion());
         tarea = tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);
     }
@@ -149,4 +151,14 @@ public class TareaService {
         tarea.setFechaLimite(fechaLimite);
         tareaRepository.save(tarea);
     }
+    @Transactional
+    public void actualizarDescripcion(Long idTarea, String descripcion) {
+        Tarea tarea = tareaRepository.findById(idTarea).orElse(null);
+        if (tarea == null) {
+            throw new TareaServiceException("No existe tarea con id " + idTarea);
+        }
+        tarea.setDescripcion(descripcion);
+        tareaRepository.save(tarea);
+    }
+    
 }

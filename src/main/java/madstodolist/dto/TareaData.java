@@ -22,6 +22,7 @@ public class TareaData implements Serializable {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaLimite;
+    private String descripcion;
 
     // ===== NUEVO MÉTODO =====
     public boolean isFechaLimiteProxima() {
@@ -72,7 +73,14 @@ public class TareaData implements Serializable {
     public void setFechaLimite(LocalDate fechaLimite) {
         this.fechaLimite = fechaLimite;
     }
-
+    public String getDescripcion() {
+        return descripcion;
+    }
+    
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+    
     // equals y hashCode por ID
     @Override
     public boolean equals(Object o) {
