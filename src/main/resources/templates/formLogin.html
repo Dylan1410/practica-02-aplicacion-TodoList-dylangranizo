@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments :: head (titulo='Login')"></head>
 
@@ -14,7 +14,7 @@
         <form method="post" th:action="@{/login}" th:object="${loginData}" novalidate>
             <div class="form-group">
                 <label for="eMail">Correo electrónico</label>
-                <input id="eMail" name="eMail" type="email" class="form-control" th:field="*{eMail}" required placeholder="tucorreo@ejemplo.com">
+                <input id="eMail" name="eMail" type="email" class="form-control" th:field="*{eMail}" required placeholder="tucorreo@gmail.com">
                 <div class="invalid-feedback">Ingresa un correo válido.</div>
             </div>
 
@@ -32,6 +32,8 @@
         <div class="text-center mt-3">
             <a th:href="@{/registro}" class="text-decoration-none">¿No tienes cuenta? Regístrate</a>
         </div>
+        <div th:if="${error}" class="alert alert-danger mt-3" role="alert">
+            <strong>Error:</strong> <span th:text="${error}">Credenciales inválidas</span>
     </div>
 </div>
 <div th:replace="fragments::javascript"></div>
