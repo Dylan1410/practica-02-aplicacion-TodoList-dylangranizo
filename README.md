@@ -6,7 +6,7 @@ Aplicación ToDoList de la asignatura  Metologias Agiles 2025-A EPN usando Sprin
 
 Necesitas tener instalado en tu sistema:
 
-- Java 8
+- Java 24
 
 ## Ejecución
 
