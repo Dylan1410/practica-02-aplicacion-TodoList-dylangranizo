@@ -5,13 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import madstodolist.service.TareaService;
 
@@ -21,16 +15,6 @@ public class TareaRestController {
 
     @Autowired
     TareaService tareaService;
-
-    @PutMapping("/{id}/titulo")
-    public ResponseEntity<?> actualizarTitulo(@PathVariable Long id, @RequestBody Map<String, String> payload) {
-        String nuevoTitulo = payload.get("titulo");
-        if (nuevoTitulo == null || nuevoTitulo.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Título vacío");
-        }
-        tareaService.modificaTarea(id, nuevoTitulo);
-        return ResponseEntity.ok().build();
-    }
 
     @PutMapping("/{id}/prioridad")
     public ResponseEntity<?> actualizarPrioridad(@PathVariable Long id, @RequestBody Map<String, String> payload) {
@@ -52,23 +36,26 @@ public class TareaRestController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}/descripcion")
-    public ResponseEntity<?> actualizarDescripcion(@PathVariable Long id, @RequestBody Map<String, String> payload) {
-        String descripcion = payload.get("descripcion");
-        if (descripcion == null) {
+    @PutMapping("/{id}/campos")
+    public ResponseEntity<?> actualizarTituloYDescripcion(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String nuevoTitulo = payload.get("titulo");
+        String nuevaDescripcion = payload.get("descripcion");
+
+        if (nuevoTitulo == null || nuevoTitulo.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Título vacío");
+        }
+        if (nuevaDescripcion == null) {
             return ResponseEntity.badRequest().body("Descripción vacía");
         }
-        tareaService.actualizarDescripcion(id, descripcion);
+
+        tareaService.actualizarTituloYDescripcion(id, nuevoTitulo, nuevaDescripcion);
         return ResponseEntity.ok().build();
     }
 
-        @PostMapping("/{id}/completada")  // ✅ ruta relativa correcta
-        @ResponseBody
-        public ResponseEntity<?> actualizarCompletada(@PathVariable Long id, @RequestBody Map<String, Boolean> payload) {
-            boolean completada = payload.get("completada");
-            tareaService.actualizarEstadoCompletada(id, completada);
-            return ResponseEntity.ok().build();
-        }
-
-
+    @PostMapping("/{id}/completada")
+    public ResponseEntity<?> actualizarCompletada(@PathVariable Long id, @RequestBody Map<String, Boolean> payload) {
+        boolean completada = payload.get("completada");
+        tareaService.actualizarEstadoCompletada(id, completada);
+        return ResponseEntity.ok().build();
+    }
 }

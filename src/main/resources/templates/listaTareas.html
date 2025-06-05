@@ -104,17 +104,23 @@
         </style>        
 </div>
 
-<!-- Título editable -->
-<div class="editable-titulo d-flex align-items-center justify-content-between w-100 mb-2"
-     th:classappend="${tarea.completada} ? ' tarea-completada' : ''"
-     th:attr="data-id=${tarea.id}">
-    <span class="titulo-texto flex-grow-1" th:text="${tarea.titulo}"></span>
-    <input class="form-control form-control-sm titulo-input d-none flex-grow-1" type="text" th:value="${tarea.titulo}">
-    <button type="button" class="btn btn-sm btn-outline-secondary ml-2">✏️</button>
-</div>
+<!-- Edición conjunta de título y descripción -->
+<div class="editable-conjunta d-flex flex-column w-100 mb-2" th:attr="data-id=${tarea.id}">
+    
+    <!-- Campo Título -->
+    <div class="d-flex align-items-center justify-content-between w-100 mb-2">
+        <span class="titulo-texto flex-grow-1" th:text="${tarea.titulo}"></span>
+        <input class="form-control form-control-sm titulo-input d-none flex-grow-1" type="text" th:value="${tarea.titulo}">
+        <button type="button" class="btn btn-sm btn-outline-secondary ml-2 editar-btn">✏️</button>
+    </div>
 
-           <!-- Descripción -->
-           <div th:if="${tarea.descripcion}" th:utext="${tarea.descripcion}" class="mb-2 small"></div>
+   <!-- Campo Descripción (con Quill.js) -->
+   <div class="descripcion-texto flex-grow-1" th:utext="${tarea.descripcion}"></div>
+   <div class="descripcion-quill d-none w-100">
+       <div class="quill-editor" style="height: 100px;"></div>
+   </div>
+
+</div>
 
            <!-- Prioridad -->
            <div class="mb-2">
@@ -275,42 +281,71 @@
 <!-- ✅ Scripts funcionales adicionales-->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // === TÍTULO editable ===
-        document.querySelectorAll(".editable-titulo").forEach(function (wrapper) {
-            const span = wrapper.querySelector(".titulo-texto");
-            const input = wrapper.querySelector(".titulo-input");
-            const btn = wrapper.querySelector("button");
-            const id = wrapper.getAttribute("data-id");
-    
-            btn.addEventListener("click", () => {
-                span.classList.add("d-none");
-                input.classList.remove("d-none");
-                input.focus();
-            });
-    
-            input.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") {
-                    const nuevo = input.value.trim();
-                    if (!nuevo) return;
-    
-                    fetch(`/api/tareas/${id}/titulo`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ titulo: nuevo })
-                    }).then(r => {
-                        if (r.ok) {
-                            span.textContent = nuevo;
-                            input.classList.add("d-none");
-                            span.classList.remove("d-none");
-                            wrapper.closest(".col-md-4").setAttribute("data-titulo", nuevo);
-                        } else {
-                            alert("Error al guardar título");
+       // === TÍTULO Y DESCRIPCIÓN editables con un solo botón ===
+       document.querySelectorAll('.editable-conjunta').forEach(function (container) {
+        const tituloSpan = container.querySelector('.titulo-texto');
+        const tituloInput = container.querySelector('.titulo-input');
+        const descripcionSpan = container.querySelector('.descripcion-texto');
+        const quillWrapper = container.querySelector('.descripcion-quill');
+        const quillContainer = container.querySelector('.quill-editor');
+        const boton = container.querySelector('.editar-btn');
+
+        let editando = false;
+        let quill = null;
+
+        boton.addEventListener('click', function () {
+            if (!editando) {
+                // Activar edición
+                tituloInput.classList.remove('d-none');
+                tituloSpan.classList.add('d-none');
+                descripcionSpan.classList.add('d-none');
+                quillWrapper.classList.remove('d-none');
+
+                if (!quill) {
+                    quill = new Quill(quillContainer, {
+                        theme: 'snow',
+                        placeholder: 'Escribe una descripción detallada...',
+                        modules: {
+                            toolbar: [
+                                ['bold', 'italic', 'underline'],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                ['link']
+                            ]
                         }
                     });
+                    quill.root.innerHTML = descripcionSpan.innerHTML;
                 }
-            });
+
+                boton.textContent = '💾';
+                editando = true;
+            } else {
+                const id = container.getAttribute('data-id');
+                const nuevoTitulo = tituloInput.value.trim();
+                const nuevaDescripcion = quill.root.innerHTML;
+
+                fetch(`/api/tareas/${id}/campos`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ titulo: nuevoTitulo, descripcion: nuevaDescripcion })
+                }).then(res => {
+                    if (res.ok) {
+                        tituloSpan.textContent = nuevoTitulo;
+                        descripcionSpan.innerHTML = nuevaDescripcion;
+
+                        tituloInput.classList.add('d-none');
+                        tituloSpan.classList.remove('d-none');
+                        descripcionSpan.classList.remove('d-none');
+                        quillWrapper.classList.add('d-none');
+
+                        boton.textContent = '✏️';
+                        editando = false;
+                    } else {
+                        alert("Error al guardar los cambios.");
+                    }
+                });
+            }
         });
-    
+    });
         // === PRIORIDAD editable ===
         document.querySelectorAll(".editable-prioridad").forEach(select => {
             select.addEventListener("change", () => {

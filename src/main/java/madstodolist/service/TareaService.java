@@ -48,20 +48,20 @@ public class TareaService {
     }
 
     @Transactional
-public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
-    logger.debug("Añadiendo tarea con DTO al usuario " + idUsuario);
-    Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
-    if (usuario == null) {
-        throw new TareaServiceException("Usuario " + idUsuario + " no existe al crear tarea " + tareaData.getTitulo());
+    public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
+        logger.debug("Añadiendo tarea con DTO al usuario " + idUsuario);
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            throw new TareaServiceException("Usuario " + idUsuario + " no existe al crear tarea " + tareaData.getTitulo());
+        }
+        Tarea tarea = new Tarea(usuario, tareaData.getTitulo());
+        tarea.setPrioridad(tareaData.getPrioridad());
+        tarea.setFechaLimite(tareaData.getFechaLimite());
+        tarea.setDescripcion(tareaData.getDescripcion());
+        tarea.setCompletada(false);
+        tareaRepository.save(tarea);
+        return modelMapper.map(tarea, TareaData.class);
     }
-    Tarea tarea = new Tarea(usuario, tareaData.getTitulo());
-    tarea.setPrioridad(tareaData.getPrioridad());
-    tarea.setFechaLimite(tareaData.getFechaLimite());
-    tarea.setDescripcion(tareaData.getDescripcion());
-    tarea.setCompletada(false);
-    tareaRepository.save(tarea);
-    return modelMapper.map(tarea, TareaData.class);
-}
 
     @Transactional(readOnly = true)
     public List<TareaData> allTareasUsuario(Long idUsuario) {
@@ -70,7 +70,7 @@ public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
         if (usuario == null) {
             throw new TareaServiceException("Usuario " + idUsuario + " no existe al listar tareas ");
         }
-    
+
         List<TareaData> tareas = usuario.getTareas().stream()
                 .map(tarea -> {
                     TareaData dto = modelMapper.map(tarea, TareaData.class);
@@ -78,30 +78,17 @@ public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
                     return dto;
                 })
                 .collect(Collectors.toList());
-    
+
         Collections.sort(tareas, (a, b) -> a.getId() < b.getId() ? -1 : a.getId().equals(b.getId()) ? 0 : 1);
-    
+
         return tareas;
     }
-    
 
     @Transactional(readOnly = true)
     public TareaData findById(Long tareaId) {
         logger.debug("Buscando tarea " + tareaId);
         Tarea tarea = tareaRepository.findById(tareaId).orElse(null);
         if (tarea == null) return null;
-        return modelMapper.map(tarea, TareaData.class);
-    }
-
-    @Transactional
-    public TareaData modificaTarea(Long idTarea, String nuevoTitulo) {
-        logger.debug("Modificando tarea " + idTarea + " - " + nuevoTitulo);
-        Tarea tarea = tareaRepository.findById(idTarea).orElse(null);
-        if (tarea == null) {
-            throw new TareaServiceException("No existe tarea con id " + idTarea);
-        }
-        tarea.setTitulo(nuevoTitulo);
-        tarea = tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);
     }
 
@@ -140,7 +127,7 @@ public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
         return usuario.getTareas().contains(tarea);
     }
 
-    // ✅ NUEVOS MÉTODOS
+    // Métodos usados por el frontend actual
 
     @Transactional
     public void actualizarPrioridad(Long idTarea, String prioridad) {
@@ -161,20 +148,20 @@ public TareaData nuevaTareaUsuario(Long idUsuario, TareaData tareaData) {
         tarea.setFechaLimite(fechaLimite);
         tareaRepository.save(tarea);
     }
+
     @Transactional
-    public void actualizarDescripcion(Long idTarea, String descripcion) {
-        Tarea tarea = tareaRepository.findById(idTarea).orElse(null);
-        if (tarea == null) {
-            throw new TareaServiceException("No existe tarea con id " + idTarea);
-        }
-        tarea.setDescripcion(descripcion);
+    public void actualizarEstadoCompletada(Long idTarea, boolean completada) {
+        Tarea tarea = tareaRepository.findById(idTarea)
+                .orElseThrow(() -> new TareaServiceException("Tarea no encontrada"));
+        tarea.setCompletada(completada);
         tareaRepository.save(tarea);
     }
+
     @Transactional
-public void actualizarEstadoCompletada(Long idTarea, boolean completada) {
-    Tarea tarea = tareaRepository.findById(idTarea)
-            .orElseThrow(() -> new TareaServiceException("Tarea no encontrada"));
-    tarea.setCompletada(completada);
-    tareaRepository.save(tarea);
+    public void actualizarTituloYDescripcion(Long id, String titulo, String descripcion) {
+        Tarea tarea = tareaRepository.findById(id).orElseThrow();
+        tarea.setTitulo(titulo);
+        tarea.setDescripcion(descripcion);
+        tareaRepository.save(tarea);
     }
 }
