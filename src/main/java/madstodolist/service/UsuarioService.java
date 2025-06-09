@@ -1,5 +1,6 @@
 package madstodolist.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -66,7 +67,7 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public UsuarioData findById(Long usuarioId) {
+    public UsuarioData findUsuarioDataById(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
         if (usuario == null) return null;
         else {
@@ -84,6 +85,14 @@ public class UsuarioService {
             return modelMapper.map(usuario, UsuarioData.class);
         }
         return null;
+    }
+    
+    public List<Usuario> findAllUsuarios() {
+        return (List<Usuario>) usuarioRepository.findAll();
+    }
+    
+    public Usuario findById(Long id) {
+        return usuarioRepository.findById(id).orElse(null);
     }
     
 }

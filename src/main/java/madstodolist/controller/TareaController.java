@@ -18,8 +18,8 @@ import madstodolist.authentication.ManagerUserSession;
 import madstodolist.controller.exception.TareaNotFoundException;
 import madstodolist.controller.exception.UsuarioNoLogeadoException;
 import madstodolist.dto.TareaData;
-import madstodolist.dto.UsuarioData;
 import madstodolist.model.Prioridad;
+import madstodolist.model.Usuario;
 import madstodolist.service.TareaService;
 import madstodolist.service.UsuarioService;
 
@@ -49,7 +49,7 @@ public class TareaController {
     
         comprobarUsuarioLogeado(idUsuario);
     
-        UsuarioData usuario = usuarioService.findById(idUsuario);
+        Usuario usuario = usuarioService.findById(idUsuario);
         model.addAttribute("usuario", usuario);
         model.addAttribute("prioridades", Prioridad.values());
         model.addAttribute("tareaData", tareaData);
@@ -74,7 +74,7 @@ public class TareaController {
     
         comprobarUsuarioLogeado(idUsuario);
     
-        UsuarioData usuario = usuarioService.findById(idUsuario);
+        Usuario usuario = usuarioService.findById(idUsuario);
         List<TareaData> tareas = tareaService.allTareasUsuario(idUsuario);
         
         model.addAttribute("usuario", usuario);

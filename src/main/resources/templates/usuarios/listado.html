@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios Registrados</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">👥 Usuarios Registrados</h2>
+
+    <h4 th:text="'Usuarios encontrados: ' + ${usuarios.size()}"></h4>
+
+    <div class="row" th:if="${usuarios.size() > 0}">
+        <div class="col-md-6 mb-4" th:each="usuario : ${usuarios}">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <!-- Foto de perfil -->
+                    <div class="rounded-circle mx-auto mb-3 shadow"
+                         style="width: 100px; height: 100px; overflow: hidden; border: 2px solid #ccc;">
+                        <img th:if="${usuario.fotoUrl}" th:src="@{${usuario.fotoUrl}}"
+                             class="img-fluid h-100 w-100" style="object-fit: cover;">
+                        <div th:unless="${usuario.fotoUrl}"
+                             class="d-flex justify-content-center align-items-center h-100 w-100 bg-secondary text-white">
+                            <span style="font-size: 2rem;">👤</span>
+                        </div>
+                    </div>
+
+                    <!-- Datos del usuario -->
+                    <h5 class="card-title" th:text="${usuario.nombre}">Nombre</h5>
+                    <p><strong>ID:</strong> <span th:text="${usuario.id}"></span></p>
+                    <p><strong>Email:</strong> <span th:text="${usuario.email}"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${usuarios.size() == 0}" class="alert alert-warning text-center mt-4">
+        No hay usuarios registrados.
+    </div>
+</div>
+</body>
+</html>

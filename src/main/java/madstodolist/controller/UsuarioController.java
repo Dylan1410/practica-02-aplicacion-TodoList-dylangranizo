@@ -3,8 +3,10 @@ package madstodolist.controller;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,9 +15,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import madstodolist.authentication.ManagerUserSession;
 import madstodolist.dto.UsuarioData;
+import madstodolist.model.Usuario;
 import madstodolist.service.UsuarioService;
 
 @Controller
@@ -29,7 +33,7 @@ public class UsuarioController {
 
     @GetMapping("/usuarios/{id}/editar")
     public String editarUsuario(@PathVariable Long id, Model model) {
-        UsuarioData usuario = usuarioService.findById(id);
+        Usuario usuario = usuarioService.findById(id);
         model.addAttribute("usuario", usuario);
         return "formEditarUsuario";
     }
@@ -74,4 +78,23 @@ public class UsuarioController {
             return "formEditarUsuario";
         }
     }
+    @GetMapping("/registrados")
+public String listadoUsuarios(Model model) {
+    List<Usuario> usuarios = usuarioService.findAllUsuarios();
+    model.addAttribute("usuarios", usuarios);
+    return "usuarios/listado";
+}
+
+@GetMapping("/registrados/{id}")
+public String descripcionUsuario(@PathVariable Long id, Model model) {
+    Usuario usuario = usuarioService.findById(id);
+    if (usuario == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+    }
+    model.addAttribute("usuario", usuario);
+    return "usuarios/descripcion";
+}
+
+
+
 }
