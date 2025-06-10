@@ -31,5 +31,9 @@ Una vez lanzada la aplicación puedes abrir un navegador y probar la página de 
 
 #TodoList Proyect de github
 - [https://github.com/users/Dylan1410/projects/3]
+  
 #DockerHUB
 - [https://hub.docker.com/r/dylan1410/mads-todolist/tags]
+
+#Trello
+- [https://trello.com/invite/b/68488994e0eedf8fbb979e85/ATTI1da1435c783987a5ab907e49687b6191BA565CB1/to-do-list-historias-de-usuario]
